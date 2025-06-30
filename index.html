@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roofing Business Priority Manager</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+        const { Plus, Clock, DollarSign, Users, FileText, Presentation, Edit2, Trash2, CheckCircle } = lucide;
+
+        const RoofingTimeManager = () => {
+            const [tasks, setTasks] = useState([
+                { id: 1, title: 'Follow up on Johnson roof estimate', category: 'estimates', urgency: 'high', impact: 'high', timeEstimate: 30, status: 'pending' },
+                { id: 2, title: 'Create residential pricing template', category: 'templates', urgency: 'medium', impact: 'high', timeEstimate: 120, status: 'pending' },
+                { id: 3, title: 'Prepare presentation for commercial client', category: 'presentations', urgency: 'high', impact: 'high', timeEstimate: 90, status: 'pending' }
+            ]);
+            
+            const [editingTask, setEditingTask] = useState(null);
+            
+            const [newTask, setNewTask] = useState({
+                title: '',
+                category: 'estimates',
+                urgency: 'medium',
+                impact: 'medium',
+                timeEstimate: 60
+            });
+
+            const categories = {
+                'business-dev': { label: 'Business Development', icon: Users, color: 'bg-blue-500' },
+                'sales': { label: 'Sales', icon: DollarSign, color: 'bg-emerald-500' },
+                'pricing': { label: 'Pricing Models', icon: DollarSign, color: 'bg-green-500' },
+                'templates': { label: 'Templates', icon: FileText, color: 'bg-purple-500' },
+                'estimates': { label: 'Estimates', icon: Edit2, color: 'bg-orange-500' },
+                'presentations': { label: 'Presentations', icon: Presentation, color: 'bg-red-500' }
+            };
+
+            const getPriorityScore = (task) => {
+                const urgencyScore = task.urgency === 'high' ? 3 : task.urgency === 'medium' ? 2 : 1;
+                const impactScore = task.impact === 'high' ? 3 : task.impact === 'medium' ? 2 : 1;
+                return urgencyScore * impactScore;
+            };
+
+            const addTask = () => {
+                if (newTask.title.trim()) {
+                    setTasks([...tasks, {
+                        ...newTask,
+                        id: Date.now(),
+                        status: 'pending'
+                    }]);
+                    setNewTask({
+                        title: '',
+                        category: 'estimates',
+                        urgency: 'medium',
+                        impact: 'medium',
+                        timeEstimate: 60
+                    });
+                }
+            };
+
+            const toggleTask = (id) => {
+                setTasks(tasks.map(task => 
+                    task.id === id 
+                        ? { ...task, status: task.status === 'completed' ? 'pending' : 'completed' }
+                        : task
+                ));
+            };
+
+            const deleteTask = (id) => {
+                setTasks(tasks.filter(task => task.id !== id));
+            };
+
+            const startEdit = (task) => {
+                setEditingTask({ ...task });
+            };
+
+            const saveEdit = () => {
+                setTasks(tasks.map(task => 
+                    task.id === editingTask.id ? editingTask : task
+                ));
+                setEditingTask(null);
+            };
+
+            const cancelEdit = () => {
+                setEditingTask(null);
+            };
+
+            const sortedTasks = [...tasks].sort((a, b) => {
+                if (a.status === 'completed' && b.status === 'pending') return 1;
+                if (a.status === 'pending' && b.status === 'completed') return -1;
+                return getPriorityScore(b) - getPriorityScore(a);
+            });
+
+            const totalTime = tasks.filter(t => t.status === 'pending').reduce((sum, task) => sum + task.timeEstimate, 0);
+            const highPriorityTasks = tasks.filter(t => t.status === 'pending' && getPriorityScore(t) >= 6).length;
+
+            return (
+                <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
+                    <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+                        <h1 className="text-2xl font-bold text-gray-800 mb-2">Roofing Business Priority Manager</h1>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                                <div className="flex items-center">
+                                    <Clock className="h-5 w-5 text-blue-600 mr-2" />
+                                    <span className="text-sm text-gray-600">Total Time Needed</span>
+                                </div>
+                                <p className="text-xl font-semibold text-blue-600">{Math.floor(totalTime / 60)}h {totalTime % 60}m</p>
+                            </div>
+                            <div className="bg-red-50 p-4 rounded-lg">
+                                <div className="flex items-center">
+                                    <Users className="h-5 w-5 text-red-600 mr-2" />
+                                    <span className="text-sm text-gray-600">High Priority Tasks</span>
+                                </div>
+                                <p className="text-xl font-semibold text-red-600">{highPriorityTasks}</p>
+                            </div>
+                            <div className="bg-green-50 p-4 rounded-lg">
+                                <div className="flex items-center">
+                                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                                    <span className="text-sm text-gray-600">Completed Today</span>
+                                </div>
+                                <p className="text-xl font-semibold text-green-600">{tasks.filter(t => t.status === 'completed').length}</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h2 className="text-lg font-semibold mb-4">Add New Task</h2>
+                                <div className="space-y-3">
+                                    <input
+                                        type="text"
+                                        placeholder="What needs to be done?"
+                                        value={newTask.title}
+                                        onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        onKeyPress={(e) => e.key === 'Enter' && addTask()}
+                                    />
+                                    
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <select
+                                            value={newTask.category}
+                                            onChange={(e) => setNewTask({...newTask, category: e.target.value})}
+                                            className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            {Object.entries(categories).map(([key, cat]) => (
+                                                <option key={key} value={key}>{cat.label}</option>
+                                            ))}
+                                        </select>
+
+                                        <input
+                                            type="number"
+                                            placeholder="Minutes"
+                                            value={newTask.timeEstimate}
+                                            onChange={(e) => setNewTask({...newTask, timeEstimate: parseInt(e.target.value) || 0})}
+                                            className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Urgency</label>
+                                            <select
+                                                value={newTask.urgency}
+                                                onChange={(e) => setNewTask({...newTask, urgency: e.target.value})}
+                                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            >
+                                                <option value="low">Low</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="high">High</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Business Impact</label>
+                                            <select
+                                                value={newTask.impact}
+                                                onChange={(e) => setNewTask({...newTask, impact: e.target.value})}
+                                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            >
+                                                <option value="low">Low</option>
+                                                <option value="medium">Medium</option>
+                                                <option value="high">High</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={addTask}
+                                        className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 flex items-center justify-center transition-colors"
+                                    >
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Add Task
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h2 className="text-lg font-semibold mb-4">Priority Queue</h2>
+                                <div className="space-y-3 max-h-96 overflow-y-auto">
+                                    {sortedTasks.map((task) => {
+                                        const category = categories[task.category];
+                                        const priorityScore = getPriorityScore(task);
+                                        const Icon = category.icon;
+                                        
+                                        return (
+                                            <div
+                                                key={task.id}
+                                                className={`p-4 rounded-lg border-l-4 transition-all ${
+                                                    task.status === 'completed' 
+                                                        ? 'bg-gray-50 opacity-60' 
+                                                        : priorityScore >= 6 
+                                                            ? 'bg-red-50 border-red-500' 
+                                                            : priorityScore >= 4 
+                                                                ? 'bg-yellow-50 border-yellow-500' 
+                                                                : 'bg-green-50 border-green-500'
+                                                }`}
+                                            >
+                                                {editingTask && editingTask.id === task.id ? (
+                                                    <div className="space-y-3">
+                                                        <input
+                                                            type="text"
+                                                            value={editingTask.title}
+                                                            onChange={(e) => setEditingTask({...editingTask, title: e.target.value})}
+                                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                        />
+                                                        
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            <select
+                                                                value={editingTask.category}
+                                                                onChange={(e) => setEditingTask({...editingTask, category: e.target.value})}
+                                                                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                            >
+                                                                {Object.entries(categories).map(([key, cat]) => (
+                                                                    <option key={key} value={key}>{cat.label}</option>
+                                                                ))}
+                                                            </select>
+
+                                                            <select
+                                                                value={editingTask.urgency}
+                                                                onChange={(e) => setEditingTask({...editingTask, urgency: e.target.value})}
+                                                                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                            >
+                                                                <option value="low">Low</option>
+                                                                <option value="medium">Medium</option>
+                                                                <option value="high">High</option>
+                                                            </select>
+
+                                                            <select
+                                                                value={editingTask.impact}
+                                                                onChange={(e) => setEditingTask({...editingTask, impact: e.target.value})}
+                                                                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                            >
+                                                                <option value="low">Low</option>
+                                                                <option value="medium">Medium</option>
+                                                                <option value="high">High</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div className="flex space-x-2">
+                                                            <input
+                                                                type="number"
+                                                                value={editingTask.timeEstimate}
+                                                                onChange={(e) => setEditingTask({...editingTask, timeEstimate: parseInt(e.target.value) || 0})}
+                                                                className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                                placeholder="Minutes"
+                                                            />
+                                                            <button
+                                                                onClick={saveEdit}
+                                                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                                            >
+                                                                Save
+                                                            </button>
+                                                            <button
+                                                                onClick={cancelEdit}
+                                                                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-start justify-between">
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center mb-2">
+                                                                <button
+                                                                    onClick={() => toggleTask(task.id)}
+                                                                    className={`mr-3 transition-colors ${
+                                                                        task.status === 'completed'
+                                                                            ? 'text-green-600'
+                                                                            : 'text-gray-400 hover:text-green-600'
+                                                                    }`}
+                                                                >
+                                                                    <CheckCircle className="h-5 w-5" />
+                                                                </button>
+                                                                <Icon className="h-4 w-4 mr-2 text-gray-600" />
+                                                                <span className={`text-sm font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+                                                                    {task.title}
+                                                                </span>
+                                                            </div>
+                                                            
+                                                            <div className="ml-8 flex items-center space-x-4 text-xs text-gray-500">
+                                                                <span>{category.label}</span>
+                                                                <span>•</span>
+                                                                <span>{task.timeEstimate}min</span>
+                                                                <span>•</span>
+                                                                <span className={`px-2 py-1 rounded ${
+                                                                    priorityScore >= 6 ? 'bg-red-100 text-red-800' :
+                                                                    priorityScore >= 4 ? 'bg-yellow-100 text-yellow-800' :
+                                                                    'bg-green-100 text-green-800'
+                                                                }`}>
+                                                                    {priorityScore >= 6 ? 'URGENT' : priorityScore >= 4 ? 'Important' : 'Normal'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="flex space-x-1">
+                                                            <button
+                                                                onClick={() => startEdit(task)}
+                                                                className="text-gray-400 hover:text-blue-600 transition-colors"
+                                                            >
+                                                                <Edit2 className="h-4 w-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => deleteTask(task.id)}
+                                                                className="text-gray-400 hover:text-red-600 transition-colors"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="bg-white rounded-lg shadow-lg p-6">
+                        <h2 className="text-lg font-semibold mb-4">Quick Action Guide</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="p-4 bg-red-50 rounded-lg">
+                                <h3 className="font-medium text-red-800 mb-2">🔥 Do First (High Urgency + High Impact)</h3>
+                                <p className="text-sm text-red-700">Customer estimates, urgent repairs, time-sensitive bids</p>
+                            </div>
+                            <div className="p-4 bg-blue-50 rounded-lg">
+                                <h3 className="font-medium text-blue-800 mb-2">📅 Schedule (Low Urgency + High Impact)</h3>
+                                <p className="text-sm text-blue-700">Build templates, pricing models, business development</p>
+                            </div>
+                            <div className="p-4 bg-green-50 rounded-lg">
+                                <h3 className="font-medium text-green-800 mb-2">⚡ Quick Wins (High Urgency + Low Impact)</h3>
+                                <p className="text-sm text-green-700">Quick calls, simple follow-ups, routine admin</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<RoofingTimeManager />, document.getElementById('root'));
+    </script>
+</body>
+</html>
