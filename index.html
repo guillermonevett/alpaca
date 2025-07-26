@@ -1,502 +1,764 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roofing Priority Manager</title>
+    <title>Roofing Business Priority Manager</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #f0f2f5;
-            min-height: 100vh;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-card.blue { background: #dbeafe; color: #1e40af; }
+        .stat-card.red { background: #fecaca; color: #dc2626; }
+        .stat-card.green { background: #dcfce7; color: #16a34a; }
+        .stat-card.orange { background: #fed7aa; color: #ea580c; }
+        .stat-number { font-size: 24px; font-weight: bold; margin-top: 5px; }
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-control { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+        .form-control:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .btn { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn-success:hover { background: #15803d; }
+        .btn-warning { background: #ea580c; color: white; }
+        .btn-warning:hover { background: #c2410c; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #4b5563; }
+        .task-list { max-height: 500px; overflow-y: auto; }
+        .task-item { border: 1px solid #e5e7eb; border-left: 4px solid; border-radius: 6px; padding: 15px; margin-bottom: 10px; transition: all 0.2s; }
+        .task-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .task-item.urgent { border-left-color: #dc2626; background: #fef2f2; }
+        .task-item.important { border-left-color: #ea580c; background: #fff7ed; }
+        .task-item.normal { border-left-color: #16a34a; background: #f0fdf4; }
+        .task-item.overdue { border-left-color: #991b1b; background: #fecaca; }
+        .task-item.completed { opacity: 0.6; background: #f9fafb; }
+        .task-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .task-title { font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .task-meta { font-size: 12px; color: #6b7280; display: flex; flex-wrap: wrap; gap: 15px; }
+        .task-actions { display: flex; gap: 5px; }
+        .task-actions button { background: none; border: none; cursor: pointer; padding: 5px; border-radius: 4px; }
+        .task-actions button:hover { background: #f3f4f6; }
+        .priority-badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .priority-urgent { background: #fecaca; color: #991b1b; }
+        .priority-important { background: #fed7aa; color: #9a3412; }
+        .priority-normal { background: #dcfce7; color: #166534; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 8px; padding: 20px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .checkbox { width: auto; margin-right: 8px; }
+        .hidden { display: none; }
+        .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .guide-item { padding: 15px; border-radius: 8px; }
+        .guide-item.red { background: #fecaca; color: #991b1b; }
+        .guide-item.blue { background: #dbeafe; color: #1e3a8a; }
+        .guide-item.green { background: #dcfce7; color: #166534; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+```
+    /* Authentication styles */
+    .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .auth-card { background: white; border-radius: 10px; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; width: 100%; text-align: center; }
+    .auth-card h1 { margin-bottom: 10px; color: #2c3e50; }
+    .auth-card p { color: #666; margin-bottom: 30px; }
+    .main-app { display: none; }
 
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
+    @media (max-width: 768px) { 
+        .main-grid { grid-template-columns: 1fr; } 
+        .form-grid { grid-template-columns: 1fr; }
+        .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+</style>
+```
 
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .content {
-            padding: 20px;
-        }
-
-        .auth-section {
-            max-width: 400px;
-            margin: 0 auto;
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .main-app {
-            display: none;
-        }
-
-        .form-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin: 5px;
-        }
-
-        button:hover {
-            background: #2980b9;
-        }
-
-        .delete-btn {
-            background: #e74c3c;
-        }
-
-        .delete-btn:hover {
-            background: #c0392b;
-        }
-
-        .job-item {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #3498db;
-        }
-
-        .job-item.high {
-            border-left-color: #e74c3c;
-        }
-
-        .job-item.medium {
-            border-left-color: #f39c12;
-        }
-
-        .job-item.low {
-            border-left-color: #27ae60;
-        }
-
-        .job-header {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .job-details {
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .job-detail {
-            margin-bottom: 5px;
-        }
-
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 6px;
-            text-align: center;
-            border: 1px solid #ddd;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: #3498db;
-        }
-
-        .filters {
-            margin-bottom: 20px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #27ae60;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
-            }
-            
-            .stats {
-                flex-direction: column;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="status" id="status">Ready</div>
-    
-    <div class="container">
-        <div class="header">
+    <!-- Authentication Screen -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-card">
             <h1>🏠 Roofing Priority Manager</h1>
-            <p>Manage your roofing jobs and priorities</p>
+            <p>Access your business dashboard</p>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="passwordInput" class="form-control" placeholder="Enter password">
+            </div>
+            <button onclick="authenticate()" class="btn btn-primary" style="width: 100%;">Login</button>
+            <p style="margin-top: 20px; color: #666; font-size: 14px;">
+                Default password: <strong>roofing123</strong>
+            </p>
         </div>
+    </div>
 
-        <div class="content">
-            <!-- Login Section -->
-            <div class="auth-section" id="loginSection">
-                <h2>Login to Your Dashboard</h2>
-                <div class="form-group">
-                    <label>Password:</label>
-                    <input type="password" id="passwordInput" placeholder="Enter password">
+```
+<!-- Main Application -->
+<div class="main-app" id="mainApp">
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Roofing Business Priority Manager</h1>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="showReport()">📊 View Report</button>
+                    <button class="btn btn-primary" onclick="exportData()">💾 Export Data</button>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
                 </div>
-                <button onclick="login()">Login</button>
-                <p style="margin-top: 20px; color: #666; font-size: 14px;">
-                    Default password: <strong>roofing123</strong>
-                </p>
             </div>
 
-            <!-- Main App -->
-            <div class="main-app" id="mainApp">
-                <!-- Statistics -->
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalJobs">0</div>
-                        <div>Total Jobs</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="highPriority">0</div>
-                        <div>High Priority</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="inProgress">0</div>
-                        <div>In Progress</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="completed">0</div>
-                        <div>Completed</div>
-                    </div>
+            <div class="stats">
+                <div class="stat-card blue">
+                    <div>Total Time Needed</div>
+                    <div class="stat-number" id="totalTime">0h 0m</div>
+                </div>
+                <div class="stat-card red">
+                    <div>High Priority Tasks</div>
+                    <div class="stat-number" id="highPriority">0</div>
+                </div>
+                <div class="stat-card green">
+                    <div>Completed Tasks</div>
+                    <div class="stat-number" id="completedTasks">0</div>
+                </div>
+                <div class="stat-card orange">
+                    <div>Overdue Tasks</div>
+                    <div class="stat-number" id="overdueTasks">0</div>
+                </div>
+            </div>
+
+            <div class="main-grid">
+                <div>
+                    <h2 style="margin-bottom: 15px;">Add New Task</h2>
+                    <form id="taskForm">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="What needs to be done?" id="taskTitle" required>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select class="form-control" id="taskCategory">
+                                    <option value="business-dev">Business Development</option>
+                                    <option value="sales">Sales</option>
+                                    <option value="pricing">Pricing Models</option>
+                                    <option value="templates">Templates</option>
+                                    <option value="estimates" selected>Estimates</option>
+                                    <option value="presentations">Presentations</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Time (minutes)</label>
+                                <input type="number" class="form-control" id="taskTime" value="60" min="1">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Assigned To</label>
+                                <select class="form-control" id="taskAssignee">
+                                    <option value="John Smith">John Smith</option>
+                                    <option value="Mike Johnson">Mike Johnson</option>
+                                    <option value="Sarah Davis">Sarah Davis</option>
+                                    <option value="Tom Wilson">Tom Wilson</option>
+                                    <option value="Lisa Brown">Lisa Brown</option>
+                                    <option value="Unassigned">Unassigned</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Due Date</label>
+                                <input type="date" class="form-control" id="taskDueDate">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Urgency</label>
+                                <select class="form-control" id="taskUrgency">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Business Impact</label>
+                                <select class="form-control" id="taskImpact">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">➕ Add Task</button>
+                    </form>
                 </div>
 
-                <!-- Add Job Form -->
-                <div class="form-section">
-                    <h3>Add New Job</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Customer Name:</label>
-                            <input type="text" id="customerName" placeholder="John Smith">
-                        </div>
-                        <div class="form-group">
-                            <label>Address:</label>
-                            <input type="text" id="address" placeholder="123 Main St">
-                        </div>
+                <div>
+                    <h2 style="margin-bottom: 15px;">Priority Queue</h2>
+                    <div class="task-list" id="taskList">
+                        <!-- Tasks will be populated here -->
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Job Type:</label>
-                            <select id="jobType">
-                                <option value="repair">Repair</option>
-                                <option value="replacement">Full Replacement</option>
-                                <option value="inspection">Inspection</option>
-                                <option value="maintenance">Maintenance</option>
-                                <option value="emergency">Emergency</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Priority:</label>
-                            <select id="priority">
-                                <option value="high">High</option>
-                                <option value="medium">Medium</option>
-                                <option value="low">Low</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Estimated Value ($):</label>
-                            <input type="number" id="value" placeholder="5000">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Notes:</label>
-                        <textarea id="notes" rows="3" placeholder="Additional details..."></textarea>
-                    </div>
-                    <button onclick="addJob()">Add Job</button>
                 </div>
+            </div>
+        </div>
 
-                <!-- Filters -->
-                <div class="filters">
-                    <select id="filterPriority" onchange="renderJobs()">
-                        <option value="">All Priorities</option>
-                        <option value="high">High Priority</option>
-                        <option value="medium">Medium Priority</option>
-                        <option value="low">Low Priority</option>
-                    </select>
-                    <select id="filterStatus" onchange="renderJobs()">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                    <button onclick="exportJobs()">Export Data</button>
-                    <button onclick="logout()">Logout</button>
+        <div class="card">
+            <h2 style="margin-bottom: 15px;">Quick Action Guide</h2>
+            <div class="guide-grid">
+                <div class="guide-item red">
+                    <h3>🔥 Do First (High Urgency + High Impact)</h3>
+                    <p>Customer estimates, urgent repairs, time-sensitive bids</p>
                 </div>
-
-                <!-- Jobs List -->
-                <div id="jobsList">
-                    <p style="text-align: center; color: #666; padding: 20px;">No jobs added yet. Add your first job above!</p>
+                <div class="guide-item blue">
+                    <h3>📅 Schedule (Low Urgency + High Impact)</h3>
+                    <p>Build templates, pricing models, business development</p>
+                </div>
+                <div class="guide-item green">
+                    <h3>⚡ Quick Wins (High Urgency + Low Impact)</h3>
+                    <p>Quick calls, simple follow-ups, routine admin</p>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Simple JavaScript - no ES6 features
-        var jobs = [];
-        var isLoggedIn = false;
+<!-- Task Closure Modal -->
+<div class="modal" id="closureModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Close Task</h3>
+            <button onclick="closeModal('closureModal')" style="background: none; border: none; font-size: 18px; cursor: pointer;">✕</button>
+        </div>
+        <div id="closureContent"></div>
+    </div>
+</div>
 
-        function login() {
-            var password = document.getElementById('passwordInput').value;
-            if (password === 'roofing123') {
-                isLoggedIn = true;
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                loadJobs();
-                updateStatus('Logged in successfully');
-            } else {
-                alert('Wrong password! Try: roofing123');
+<!-- Report Modal -->
+<div class="modal" id="reportModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Performance Report</h3>
+            <button onclick="closeModal('reportModal')" style="background: none; border: none; font-size: 18px; cursor: pointer;">✕</button>
+        </div>
+        <div id="reportContent"></div>
+    </div>
+</div>
+
+<script>
+    // Global variables
+    var tasks = [
+        {
+            id: 1,
+            title: 'Follow up on Johnson roof estimate',
+            category: 'estimates',
+            urgency: 'high',
+            impact: 'high',
+            timeEstimate: 30,
+            status: 'pending',
+            assignedTo: 'John Smith',
+            dueDate: '2025-07-26',
+            createdDate: '2025-07-25'
+        },
+        {
+            id: 2,
+            title: 'Create residential pricing template',
+            category: 'templates',
+            urgency: 'medium',
+            impact: 'high',
+            timeEstimate: 120,
+            status: 'pending',
+            assignedTo: 'Mike Johnson',
+            dueDate: '2025-07-28',
+            createdDate: '2025-07-25'
+        }
+    ];
+
+    var closedTasks = [];
+    var currentClosingTask = null;
+    var isAuthenticated = false;
+
+    var categories = {
+        'business-dev': { label: 'Business Development', icon: '👥' },
+        'sales': { label: 'Sales', icon: '💰' },
+        'pricing': { label: 'Pricing Models', icon: '💲' },
+        'templates': { label: 'Templates', icon: '📄' },
+        'estimates': { label: 'Estimates', icon: '✏️' },
+        'presentations': { label: 'Presentations', icon: '📊' }
+    };
+
+    var teamMembers = ['John Smith', 'Mike Johnson', 'Sarah Davis', 'Tom Wilson', 'Lisa Brown', 'Unassigned'];
+
+    // Authentication
+    function authenticate() {
+        var password = document.getElementById('passwordInput').value;
+        if (password === 'roofing123') {
+            isAuthenticated = true;
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            loadData();
+            initialize();
+        } else {
+            alert('Incorrect password! Try: roofing123');
+        }
+    }
+
+    function logout() {
+        isAuthenticated = false;
+        document.getElementById('authContainer').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('passwordInput').value = '';
+    }
+
+    // Initialize
+    function initialize() {
+        document.getElementById('taskDueDate').value = new Date().toISOString().split('T')[0];
+        renderTasks();
+        updateStats();
+    }
+
+    // Task management functions
+    function getPriorityScore(task) {
+        var urgencyScore = task.urgency === 'high' ? 3 : task.urgency === 'medium' ? 2 : 1;
+        var impactScore = task.impact === 'high' ? 3 : task.impact === 'medium' ? 2 : 1;
+        return urgencyScore * impactScore;
+    }
+
+    function isOverdue(task) {
+        if (task.status === 'completed') return false;
+        return new Date(task.dueDate) < new Date();
+    }
+
+    function addTask() {
+        var newTask = {
+            id: Date.now(),
+            title: document.getElementById('taskTitle').value,
+            category: document.getElementById('taskCategory').value,
+            timeEstimate: parseInt(document.getElementById('taskTime').value) || 60,
+            assignedTo: document.getElementById('taskAssignee').value,
+            dueDate: document.getElementById('taskDueDate').value,
+            urgency: document.getElementById('taskUrgency').value,
+            impact: document.getElementById('taskImpact').value,
+            status: 'pending',
+            createdDate: new Date().toISOString().split('T')[0]
+        };
+
+        tasks.push(newTask);
+        
+        // Clear form
+        document.getElementById('taskForm').reset();
+        document.getElementById('taskDueDate').value = new Date().toISOString().split('T')[0];
+        
+        saveData();
+        renderTasks();
+        updateStats();
+    }
+
+    function deleteTask(id) {
+        if (confirm('Are you sure you want to delete this task?')) {
+            tasks = tasks.filter(function(task) { return task.id !== id; });
+            saveData();
+            renderTasks();
+            updateStats();
+        }
+    }
+
+    function startTaskClosure(id) {
+        currentClosingTask = null;
+        for (var i = 0; i < tasks.length; i++) {
+            if (tasks[i].id === id) {
+                currentClosingTask = tasks[i];
+                break;
             }
         }
+        if (currentClosingTask) {
+            showClosureModal();
+        }
+    }
 
-        function logout() {
-            isLoggedIn = false;
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('mainApp').style.display = 'none';
-            document.getElementById('passwordInput').value = '';
+    function completeTask(id) {
+        var task = null;
+        for (var i = 0; i < tasks.length; i++) {
+            if (tasks[i].id === id) {
+                task = tasks[i];
+                break;
+            }
+        }
+        
+        if (task) {
+            task.status = 'closed';
+            task.completedDate = new Date().toISOString().split('T')[0];
+            task.closureReason = 'completed';
+            
+            closedTasks.push(task);
+            tasks = tasks.filter(function(t) { return t.id !== id; });
+            
+            saveData();
+            renderTasks();
+            updateStats();
+            closeModal('closureModal');
+        }
+    }
+
+    function closeTaskWithReason() {
+        var reason = document.getElementById('closureReason').value;
+        var needsSuccessor = document.getElementById('needsSuccessor').checked;
+        
+        if (!reason.trim()) {
+            alert('Please provide a reason why the task wasn\'t completed.');
+            return;
         }
 
-        function addJob() {
-            var customerName = document.getElementById('customerName').value;
-            var address = document.getElementById('address').value;
-            var jobType = document.getElementById('jobType').value;
-            var priority = document.getElementById('priority').value;
-            var value = document.getElementById('value').value;
-            var notes = document.getElementById('notes').value;
+        currentClosingTask.status = 'closed';
+        currentClosingTask.completedDate = new Date().toISOString().split('T')[0];
+        currentClosingTask.closureReason = reason;
+        
+        closedTasks.push(currentClosingTask);
+        tasks = tasks.filter(function(t) { return t.id !== currentClosingTask.id; });
 
-            if (!customerName || !address) {
-                alert('Please enter customer name and address');
-                return;
-            }
-
-            var job = {
+        if (needsSuccessor) {
+            var successorTask = {
                 id: Date.now(),
-                customerName: customerName,
-                address: address,
-                jobType: jobType,
-                priority: priority,
-                value: parseInt(value) || 0,
-                notes: notes,
+                title: document.getElementById('successorTitle').value || 'Follow-up: ' + currentClosingTask.title,
+                category: document.getElementById('successorCategory').value,
+                timeEstimate: parseInt(document.getElementById('successorTime').value) || 60,
+                assignedTo: document.getElementById('successorAssignee').value,
+                dueDate: document.getElementById('successorDueDate').value,
+                urgency: document.getElementById('successorUrgency').value,
+                impact: document.getElementById('successorImpact').value,
                 status: 'pending',
-                created: new Date().toLocaleDateString()
+                createdDate: new Date().toISOString().split('T')[0]
             };
-
-            jobs.push(job);
-            
-            // Clear form
-            document.getElementById('customerName').value = '';
-            document.getElementById('address').value = '';
-            document.getElementById('value').value = '';
-            document.getElementById('notes').value = '';
-
-            saveJobs();
-            renderJobs();
-            updateStats();
-            updateStatus('Job added successfully');
+            tasks.push(successorTask);
         }
 
-        function updateJobStatus(jobId, newStatus) {
-            for (var i = 0; i < jobs.length; i++) {
-                if (jobs[i].id == jobId) {
-                    jobs[i].status = newStatus;
-                    break;
+        saveData();
+        closeModal('closureModal');
+        renderTasks();
+        updateStats();
+    }
+
+    function renderTasks() {
+        var taskList = document.getElementById('taskList');
+        
+        // Sort tasks: overdue first, then by priority score
+        var sortedTasks = tasks.slice().sort(function(a, b) {
+            if (isOverdue(a) && !isOverdue(b)) return -1;
+            if (!isOverdue(a) && isOverdue(b)) return 1;
+            if (a.status === 'completed' && b.status === 'pending') return 1;
+            if (a.status === 'pending' && b.status === 'completed') return -1;
+            return getPriorityScore(b) - getPriorityScore(a);
+        });
+
+        var html = '';
+        for (var i = 0; i < sortedTasks.length; i++) {
+            var task = sortedTasks[i];
+            var category = categories[task.category];
+            var priorityScore = getPriorityScore(task);
+            var overdue = isOverdue(task);
+            
+            var taskClass = 'task-item ';
+            if (overdue) taskClass += 'overdue';
+            else if (task.status === 'completed') taskClass += 'completed';
+            else if (priorityScore >= 6) taskClass += 'urgent';
+            else if (priorityScore >= 4) taskClass += 'important';
+            else taskClass += 'normal';
+
+            var priorityLabel = priorityScore >= 6 ? 'URGENT' : priorityScore >= 4 ? 'Important' : 'Normal';
+            var priorityBadgeClass = priorityScore >= 6 ? 'priority-urgent' : priorityScore >= 4 ? 'priority-important' : 'priority-normal';
+
+            html += '<div class="' + taskClass + '">';
+            html += '<div class="task-header">';
+            html += '<div style="flex: 1;">';
+            html += '<div class="task-title">';
+            html += '<button onclick="startTaskClosure(' + task.id + ')" style="background: none; border: none; cursor: pointer; color: ' + (task.status === 'completed' ? '#16a34a' : '#6b7280') + ';">';
+            html += task.status === 'completed' ? '✅' : '⭕';
+            html += '</button>';
+            html += '<span>' + category.icon + '</span>';
+            html += '<span style="' + (task.status === 'completed' ? 'text-decoration: line-through; color: #6b7280;' : '') + '">' + task.title + '</span>';
+            if (overdue) html += '<span style="color: #dc2626;">⚠️</span>';
+            html += '</div>';
+            html += '<div class="task-meta">';
+            html += '<span>' + category.label + '</span>';
+            html += '<span>' + task.timeEstimate + 'min</span>';
+            html += '<span class="priority-badge ' + priorityBadgeClass + '">' + priorityLabel + '</span>';
+            html += '<span>👤 ' + task.assignedTo + '</span>';
+            html += '<span style="' + (overdue ? 'color: #dc2626; font-weight: 600;' : '') + '">📅 ' + task.dueDate + '</span>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="task-actions">';
+            html += '<button onclick="editTask(' + task.id + ')" title="Edit">✏️</button>';
+            html += '<button onclick="deleteTask(' + task.id + ')" title="Delete" style="color: #dc2626;">🗑️</button>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+        }
+        
+        if (html === '') {
+            html = '<div style="text-align: center; padding: 40px; color: #666;">No tasks found. Add your first task!</div>';
+        }
+        
+        taskList.innerHTML = html;
+    }
+
+    function updateStats() {
+        var pendingTasks = tasks.filter(function(t) { return t.status === 'pending'; });
+        var totalTime = 0;
+        for (var i = 0; i < pendingTasks.length; i++) {
+            totalTime += pendingTasks[i].timeEstimate;
+        }
+        var highPriority = pendingTasks.filter(function(t) { return getPriorityScore(t) >= 6; }).length;
+        var completed = closedTasks.filter(function(t) { return t.closureReason === 'completed'; }).length;
+        var overdue = tasks.filter(isOverdue).length;
+
+        document.getElementById('totalTime').textContent = Math.floor(totalTime / 60) + 'h ' + (totalTime % 60) + 'm';
+        document.getElementById('highPriority').textContent = highPriority;
+        document.getElementById('completedTasks').textContent = completed;
+        document.getElementById('overdueTasks').textContent = overdue;
+    }
+
+    function showClosureModal() {
+        var modal = document.getElementById('closureModal');
+        var content = document.getElementById('closureContent');
+        
+        var teamMembersOptions = '';
+        for (var i = 0; i < teamMembers.length; i++) {
+            teamMembersOptions += '<option value="' + teamMembers[i] + '">' + teamMembers[i] + '</option>';
+        }
+        
+        content.innerHTML = '<h4>Close Task: ' + currentClosingTask.title + '</h4>' +
+            '<p style="margin: 15px 0; color: #6b7280;">How was this task completed?</p>' +
+            '<button onclick="completeTask(' + currentClosingTask.id + ')" class="btn btn-success" style="width: 100%; margin-bottom: 15px;">' +
+            '✅ Task completed successfully</button>' +
+            '<div style="border: 1px solid #fbbf24; background: #fef3c7; padding: 15px; border-radius: 6px;">' +
+            '<p style="font-weight: 600; margin-bottom: 10px;">⚠️ Task not completed - needs follow-up</p>' +
+            '<textarea id="closureReason" placeholder="Why wasn\'t this completed? (required)" class="form-control" rows="3" style="margin-bottom: 10px;"></textarea>' +
+            '<label style="display: flex; align-items: center; margin-bottom: 15px;">' +
+            '<input type="checkbox" id="needsSuccessor" class="checkbox" onchange="toggleSuccessorForm()">' +
+            '<span>Create a follow-up task</span></label>' +
+            '<div id="successorForm" class="hidden" style="border-left: 3px solid #3b82f6; padding-left: 15px; margin-left: 15px;">' +
+            '<div class="form-group"><input type="text" id="successorTitle" placeholder="Follow-up task title" class="form-control"></div>' +
+            '<div class="form-grid">' +
+            '<select id="successorCategory" class="form-control">' +
+            '<option value="business-dev">Business Development</option>' +
+            '<option value="sales">Sales</option>' +
+            '<option value="pricing">Pricing Models</option>' +
+            '<option value="templates">Templates</option>' +
+            '<option value="estimates">Estimates</option>' +
+            '<option value="presentations">Presentations</option></select>' +
+            '<select id="successorAssignee" class="form-control">' + teamMembersOptions + '</select></div>' +
+            '<div class="form-grid-3">' +
+            '<select id="successorUrgency" class="form-control">' +
+            '<option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>' +
+            '<select id="successorImpact" class="form-control">' +
+            '<option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>' +
+            '<input type="number" id="successorTime" placeholder="Minutes" class="form-control" value="60"></div>' +
+            '<input type="date" id="successorDueDate" class="form-control" value="' + new Date().toISOString().split('T')[0] + '"></div>' +
+            '<button onclick="closeTaskWithReason()" class="btn btn-warning" style="width: 100%; margin-top: 15px;">Close with Reason</button></div>';
+        
+        modal.classList.add('show');
+    }
+
+    function toggleSuccessorForm() {
+        var form = document.getElementById('successorForm');
+        var checkbox = document.getElementById('needsSuccessor');
+        
+        if (checkbox.checked) {
+            form.classList.remove('hidden');
+        } else {
+            form.classList.add('hidden');
+        }
+    }
+
+    function showReport() {
+        var modal = document.getElementById('reportModal');
+        var content = document.getElementById('reportContent');
+        
+        var allTasks = tasks.concat(closedTasks);
+        var completed = closedTasks.filter(function(t) { return t.closureReason === 'completed'; }).length;
+        var incomplete = closedTasks.filter(function(t) { return t.closureReason !== 'completed'; }).length;
+        var overdue = tasks.filter(isOverdue).length;
+
+        var memberStatsHtml = '';
+        for (var i = 0; i < teamMembers.length; i++) {
+            var member = teamMembers[i];
+            var memberTasks = allTasks.filter(function(t) { return t.assignedTo === member; });
+            var memberCompleted = closedTasks.filter(function(t) { return t.assignedTo === member && t.closureReason === 'completed'; }).length;
+            memberStatsHtml += '<div style="display: flex; justify-content: space-between; padding: 8px; background: #f9fafb; margin-bottom: 5px; border-radius: 4px;">' +
+                '<span style="font-weight: 500;">' + member + '</span>' +
+                '<span style="color: #6b7280;">' + memberTasks.length + ' total, ' + memberCompleted + ' completed</span></div>';
+        }
+
+        var recentClosuresHtml = '';
+        var recentClosures = closedTasks.slice(-10).reverse();
+        if (recentClosures.length === 0) {
+            recentClosuresHtml = '<p style="color: #6b7280;">No tasks closed yet</p>';
+        } else {
+            for (var i = 0; i < recentClosures.length; i++) {
+                var task = recentClosures[i];
+                var statusColor = task.closureReason === 'completed' ? '#16a34a' : '#ea580c';
+                var statusText = task.closureReason === 'completed' ? '✅ Completed' : '⚠️ ' + task.closureReason;
+                recentClosuresHtml += '<div style="padding: 8px; background: #f9fafb; margin-bottom: 5px; border-radius: 4px; font-size: 14px;">' +
+                    '<div style="font-weight: 500;">' + task.title + '</div>' +
+                    '<div style="color: #6b7280;">' + task.assignedTo + ' - ' + task.completedDate + ' - ' +
+                    '<span style="color: ' + statusColor + ';">' + statusText + '</span></div></div>';
+            }
+        }
+
+        content.innerHTML = '<div class="stats" style="margin-bottom: 20px;">' +
+            '<div class="stat-card blue"><div>Active Tasks</div><div class="stat-number">' + tasks.length + '</div></div>' +
+            '<div class="stat-card green"><div>Completed</div><div class="stat-number">' + completed + '</div></div>' +
+            '<div class="stat-card orange"><div>Incomplete</div><div class="stat-number">' + incomplete + '</div></div>' +
+            '<div class="stat-card red"><div>Overdue</div><div class="stat-number">' + overdue + '</div></div></div>' +
+            '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">' +
+            '<div><h4 style="margin-bottom: 10px;">Tasks by Team Member</h4>' +
+            '<div style="max-height: 200px; overflow-y: auto;">' + memberStatsHtml + '</div></div>' +
+            '<div><h4 style="margin-bottom: 10px;">Recent Closures</h4>' +
+            '<div style="max-height: 200px; overflow-y: auto;">' + recentClosuresHtml + '</div></div></div>';
+        
+        modal.classList.add('show');
+    }
+
+    function exportData() {
+        var allTasks = tasks.concat(closedTasks);
+        
+        var tasksByAssignee = {};
+        for (var i = 0; i < teamMembers.length; i++) {
+            var member = teamMembers[i];
+            tasksByAssignee[member] = {
+                total: allTasks.filter(function(t) { return t.assignedTo === member; }).length,
+                completed: closedTasks.filter(function(t) { return t.assignedTo === member && t.closureReason === 'completed'; }).length,
+                active: tasks.filter(function(t) { return t.assignedTo === member; }).length
+            };
+        }
+
+        var tasksByCategory = {};
+        var categoryKeys = Object.keys(categories);
+        for (var i = 0; i < categoryKeys.length; i++) {
+            var cat = categoryKeys[i];
+            tasksByCategory[cat] = {
+                total: allTasks.filter(function(t) { return t.category === cat; }).length,
+                completed: closedTasks.filter(function(t) { return t.category === cat && t.closureReason === 'completed'; }).length,
+                active: tasks.filter(function(t) { return t.category === cat; }).length
+            };
+        }
+
+        var report = {
+            generatedDate: new Date().toISOString().split('T')[0],
+            generatedTime: new Date().toLocaleTimeString(),
+            summary: {
+                totalTasks: allTasks.length,
+                activeTasks: tasks.length,
+                completedTasks: closedTasks.filter(function(t) { return t.closureReason === 'completed'; }).length,
+                incompleteTasks: closedTasks.filter(function(t) { return t.closureReason !== 'completed'; }).length,
+                overdueTasks: tasks.filter(isOverdue).length
+            },
+            tasksByAssignee: tasksByAssignee,
+            tasksByCategory: tasksByCategory,
+            activeTasks: tasks,
+            closedTasks: closedTasks
+        };
+
+        var dataStr = JSON.stringify(report, null, 2);
+        var dataBlob = new Blob([dataStr], {type: 'application/json'});
+        var url = URL.createObjectURL(dataBlob);
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = 'roofing-report-' + report.generatedDate + '.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function editTask(id) {
+        var task = null;
+        for (var i = 0; i < tasks.length; i++) {
+            if (tasks[i].id === id) {
+                task = tasks[i];
+                break;
+            }
+        }
+        if (!task) return;
+
+        var newTitle = prompt('Edit task title:', task.title);
+        if (newTitle && newTitle.trim()) {
+            task.title = newTitle.trim();
+            saveData();
+            renderTasks();
+        }
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('show');
+    }
+
+    // Data persistence
+    function saveData() {
+        try {
+            var data = {
+                tasks: tasks,
+                closedTasks: closedTasks,
+                lastUpdated: new Date().toISOString()
+            };
+            localStorage.setItem('roofingPriorityData', JSON.stringify(data));
+        } catch (e) {
+            console.log('Could not save data to localStorage');
+        }
+    }
+
+    function loadData() {
+        try {
+            var saved = localStorage.getItem('roofingPriorityData');
+            if (saved) {
+                var data = JSON.parse(saved);
+                if (data.tasks) tasks = data.tasks;
+                if (data.closedTasks) closedTasks = data.closedTasks;
+            }
+        } catch (e) {
+            console.log('Could not load data from localStorage');
+        }
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form submission
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            addTask();
+        });
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                var modals = document.querySelectorAll('.modal.show');
+                for (var i = 0; i < modals.length; i++) {
+                    modals[i].classList.remove('show');
                 }
             }
-            saveJobs();
-            renderJobs();
-            updateStats();
-        }
+        });
 
-        function deleteJob(jobId) {
-            if (confirm('Delete this job?')) {
-                jobs = jobs.filter(function(job) {
-                    return job.id != jobId;
-                });
-                saveJobs();
-                renderJobs();
-                updateStats();
-                updateStatus('Job deleted');
+        // Enter key for password
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                authenticate();
             }
-        }
+        });
+    });
 
-        function renderJobs() {
-            var priorityFilter = document.getElementById('filterPriority').value;
-            var statusFilter = document.getElementById('filterStatus').value;
-            
-            var filteredJobs = jobs.filter(function(job) {
-                var matchesPriority = !priorityFilter || job.priority === priorityFilter;
-                var matchesStatus = !statusFilter || job.status === statusFilter;
-                return matchesPriority && matchesStatus;
-            });
-
-            var html = '';
-            if (filteredJobs.length === 0) {
-                html = '<p style="text-align: center; color: #666; padding: 20px;">No jobs match the current filters</p>';
-            } else {
-                for (var i = 0; i < filteredJobs.length; i++) {
-                    var job = filteredJobs[i];
-                    html += '<div class="job-item ' + job.priority + '">';
-                    html += '<div class="job-header">' + job.customerName + '</div>';
-                    html += '<div class="job-details">';
-                    html += '<div class="job-detail"><strong>Address:</strong> ' + job.address + '</div>';
-                    html += '<div class="job-detail"><strong>Type:</strong> ' + job.jobType + '</div>';
-                    html += '<div class="job-detail"><strong>Priority:</strong> ' + job.priority + '</div>';
-                    html += '<div class="job-detail"><strong>Value:</strong> $' + job.value.toLocaleString() + '</div>';
-                    html += '<div class="job-detail"><strong>Status:</strong> ' + job.status + '</div>';
-                    html += '<div class="job-detail"><strong>Created:</strong> ' + job.created + '</div>';
-                    if (job.notes) {
-                        html += '<div class="job-detail"><strong>Notes:</strong> ' + job.notes + '</div>';
-                    }
-                    html += '</div>';
-                    html += '<div>';
-                    html += '<select onchange="updateJobStatus(' + job.id + ', this.value)">';
-                    html += '<option value="pending"' + (job.status === 'pending' ? ' selected' : '') + '>Pending</option>';
-                    html += '<option value="in-progress"' + (job.status === 'in-progress' ? ' selected' : '') + '>In Progress</option>';
-                    html += '<option value="completed"' + (job.status === 'completed' ? ' selected' : '') + '>Completed</option>';
-                    html += '</select>';
-                    html += '<button class="delete-btn" onclick="deleteJob(' + job.id + ')">Delete</button>';
-                    html += '</div>';
-                    html += '</div>';
-                }
-            }
-            
-            document.getElementById('jobsList').innerHTML = html;
-        }
-
-        function updateStats() {
-            var total = jobs.length;
-            var high = jobs.filter(function(job) { return job.priority === 'high'; }).length;
-            var inProg = jobs.filter(function(job) { return job.status === 'in-progress'; }).length;
-            var done = jobs.filter(function(job) { return job.status === 'completed'; }).length;
-
-            document.getElementById('totalJobs').textContent = total;
-            document.getElementById('highPriority').textContent = high;
-            document.getElementById('inProgress').textContent = inProg;
-            document.getElementById('completed').textContent = done;
-        }
-
-        function saveJobs() {
-            try {
-                localStorage.setItem('roofingJobs', JSON.stringify(jobs));
-            } catch (e) {
-                console.log('Could not save jobs');
-            }
-        }
-
-        function loadJobs() {
-            try {
-                var saved = localStorage.getItem('roofingJobs');
-                if (saved) {
-                    jobs = JSON.parse(saved);
-                }
-                renderJobs();
-                updateStats();
-            } catch (e) {
-                console.log('Could not load jobs');
-            }
-        }
-
-        function exportJobs() {
-            var dataStr = JSON.stringify(jobs, null, 2);
-            var dataBlob = new Blob([dataStr], {type: 'application/json'});
-            var url = URL.createObjectURL(dataBlob);
-            var link = document.createElement('a');
-            link.href = url;
-            link.download = 'roofing-jobs.json';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function updateStatus(message) {
-            document.getElementById('status').textContent = message;
-            setTimeout(function() {
-                document.getElementById('status').textContent = 'Ready';
-            }, 2000);
-        }
-
-        // Test that JavaScript is working
-        console.log('Roofing Manager loaded successfully');
-    </script>
-</body>
-</html>
+    // Initialize with authentication check
+    console.log('Roofing Priority Manager loaded successfully');
+```
