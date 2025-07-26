@@ -3,372 +3,500 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roofing Business Priority Manager</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Roofing Priority Manager</title>
     <style>
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .auth-section {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .main-app {
+            display: none;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .job-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .job-item.high {
+            border-left-color: #e74c3c;
+        }
+
+        .job-item.medium {
+            border-left-color: #f39c12;
+        }
+
+        .job-item.low {
+            border-left-color: #27ae60;
+        }
+
+        .job-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .job-details {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .job-detail {
+            margin-bottom: 5px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #ddd;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .filters {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #27ae60;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="status" id="status">Ready</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Roofing Priority Manager</h1>
+            <p>Manage your roofing jobs and priorities</p>
+        </div>
 
-    <script type="text/babel">
-        const { useState } = React;
-        const { Plus, Clock, DollarSign, Users, FileText, Presentation, Edit2, Trash2, CheckCircle } = lucide;
+        <div class="content">
+            <!-- Login Section -->
+            <div class="auth-section" id="loginSection">
+                <h2>Login to Your Dashboard</h2>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="passwordInput" placeholder="Enter password">
+                </div>
+                <button onclick="login()">Login</button>
+                <p style="margin-top: 20px; color: #666; font-size: 14px;">
+                    Default password: <strong>roofing123</strong>
+                </p>
+            </div>
 
-        const RoofingTimeManager = () => {
-            const [tasks, setTasks] = useState([
-                { id: 1, title: 'Follow up on Johnson roof estimate', category: 'estimates', urgency: 'high', impact: 'high', timeEstimate: 30, status: 'pending' },
-                { id: 2, title: 'Create residential pricing template', category: 'templates', urgency: 'medium', impact: 'high', timeEstimate: 120, status: 'pending' },
-                { id: 3, title: 'Prepare presentation for commercial client', category: 'presentations', urgency: 'high', impact: 'high', timeEstimate: 90, status: 'pending' }
-            ]);
-            
-            const [editingTask, setEditingTask] = useState(null);
-            
-            const [newTask, setNewTask] = useState({
-                title: '',
-                category: 'estimates',
-                urgency: 'medium',
-                impact: 'medium',
-                timeEstimate: 60
-            });
-
-            const categories = {
-                'business-dev': { label: 'Business Development', icon: Users, color: 'bg-blue-500' },
-                'sales': { label: 'Sales', icon: DollarSign, color: 'bg-emerald-500' },
-                'pricing': { label: 'Pricing Models', icon: DollarSign, color: 'bg-green-500' },
-                'templates': { label: 'Templates', icon: FileText, color: 'bg-purple-500' },
-                'estimates': { label: 'Estimates', icon: Edit2, color: 'bg-orange-500' },
-                'presentations': { label: 'Presentations', icon: Presentation, color: 'bg-red-500' }
-            };
-
-            const getPriorityScore = (task) => {
-                const urgencyScore = task.urgency === 'high' ? 3 : task.urgency === 'medium' ? 2 : 1;
-                const impactScore = task.impact === 'high' ? 3 : task.impact === 'medium' ? 2 : 1;
-                return urgencyScore * impactScore;
-            };
-
-            const addTask = () => {
-                if (newTask.title.trim()) {
-                    setTasks([...tasks, {
-                        ...newTask,
-                        id: Date.now(),
-                        status: 'pending'
-                    }]);
-                    setNewTask({
-                        title: '',
-                        category: 'estimates',
-                        urgency: 'medium',
-                        impact: 'medium',
-                        timeEstimate: 60
-                    });
-                }
-            };
-
-            const toggleTask = (id) => {
-                setTasks(tasks.map(task => 
-                    task.id === id 
-                        ? { ...task, status: task.status === 'completed' ? 'pending' : 'completed' }
-                        : task
-                ));
-            };
-
-            const deleteTask = (id) => {
-                setTasks(tasks.filter(task => task.id !== id));
-            };
-
-            const startEdit = (task) => {
-                setEditingTask({ ...task });
-            };
-
-            const saveEdit = () => {
-                setTasks(tasks.map(task => 
-                    task.id === editingTask.id ? editingTask : task
-                ));
-                setEditingTask(null);
-            };
-
-            const cancelEdit = () => {
-                setEditingTask(null);
-            };
-
-            const sortedTasks = [...tasks].sort((a, b) => {
-                if (a.status === 'completed' && b.status === 'pending') return 1;
-                if (a.status === 'pending' && b.status === 'completed') return -1;
-                return getPriorityScore(b) - getPriorityScore(a);
-            });
-
-            const totalTime = tasks.filter(t => t.status === 'pending').reduce((sum, task) => sum + task.timeEstimate, 0);
-            const highPriorityTasks = tasks.filter(t => t.status === 'pending' && getPriorityScore(t) >= 6).length;
-
-            return (
-                <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
-                    <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-                        <h1 className="text-2xl font-bold text-gray-800 mb-2">Roofing Business Priority Manager</h1>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div className="bg-blue-50 p-4 rounded-lg">
-                                <div className="flex items-center">
-                                    <Clock className="h-5 w-5 text-blue-600 mr-2" />
-                                    <span className="text-sm text-gray-600">Total Time Needed</span>
-                                </div>
-                                <p className="text-xl font-semibold text-blue-600">{Math.floor(totalTime / 60)}h {totalTime % 60}m</p>
-                            </div>
-                            <div className="bg-red-50 p-4 rounded-lg">
-                                <div className="flex items-center">
-                                    <Users className="h-5 w-5 text-red-600 mr-2" />
-                                    <span className="text-sm text-gray-600">High Priority Tasks</span>
-                                </div>
-                                <p className="text-xl font-semibold text-red-600">{highPriorityTasks}</p>
-                            </div>
-                            <div className="bg-green-50 p-4 rounded-lg">
-                                <div className="flex items-center">
-                                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                                    <span className="text-sm text-gray-600">Completed Today</span>
-                                </div>
-                                <p className="text-xl font-semibold text-green-600">{tasks.filter(t => t.status === 'completed').length}</p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
-                                <h2 className="text-lg font-semibold mb-4">Add New Task</h2>
-                                <div className="space-y-3">
-                                    <input
-                                        type="text"
-                                        placeholder="What needs to be done?"
-                                        value={newTask.title}
-                                        onChange={(e) => setNewTask({...newTask, title: e.target.value})}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        onKeyPress={(e) => e.key === 'Enter' && addTask()}
-                                    />
-                                    
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <select
-                                            value={newTask.category}
-                                            onChange={(e) => setNewTask({...newTask, category: e.target.value})}
-                                            className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        >
-                                            {Object.entries(categories).map(([key, cat]) => (
-                                                <option key={key} value={key}>{cat.label}</option>
-                                            ))}
-                                        </select>
-
-                                        <input
-                                            type="number"
-                                            placeholder="Minutes"
-                                            value={newTask.timeEstimate}
-                                            onChange={(e) => setNewTask({...newTask, timeEstimate: parseInt(e.target.value) || 0})}
-                                            className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Urgency</label>
-                                            <select
-                                                value={newTask.urgency}
-                                                onChange={(e) => setNewTask({...newTask, urgency: e.target.value})}
-                                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            >
-                                                <option value="low">Low</option>
-                                                <option value="medium">Medium</option>
-                                                <option value="high">High</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Business Impact</label>
-                                            <select
-                                                value={newTask.impact}
-                                                onChange={(e) => setNewTask({...newTask, impact: e.target.value})}
-                                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            >
-                                                <option value="low">Low</option>
-                                                <option value="medium">Medium</option>
-                                                <option value="high">High</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        onClick={addTask}
-                                        className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 flex items-center justify-center transition-colors"
-                                    >
-                                        <Plus className="h-4 w-4 mr-2" />
-                                        Add Task
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h2 className="text-lg font-semibold mb-4">Priority Queue</h2>
-                                <div className="space-y-3 max-h-96 overflow-y-auto">
-                                    {sortedTasks.map((task) => {
-                                        const category = categories[task.category];
-                                        const priorityScore = getPriorityScore(task);
-                                        const Icon = category.icon;
-                                        
-                                        return (
-                                            <div
-                                                key={task.id}
-                                                className={`p-4 rounded-lg border-l-4 transition-all ${
-                                                    task.status === 'completed' 
-                                                        ? 'bg-gray-50 opacity-60' 
-                                                        : priorityScore >= 6 
-                                                            ? 'bg-red-50 border-red-500' 
-                                                            : priorityScore >= 4 
-                                                                ? 'bg-yellow-50 border-yellow-500' 
-                                                                : 'bg-green-50 border-green-500'
-                                                }`}
-                                            >
-                                                {editingTask && editingTask.id === task.id ? (
-                                                    <div className="space-y-3">
-                                                        <input
-                                                            type="text"
-                                                            value={editingTask.title}
-                                                            onChange={(e) => setEditingTask({...editingTask, title: e.target.value})}
-                                                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                        />
-                                                        
-                                                        <div className="grid grid-cols-3 gap-2">
-                                                            <select
-                                                                value={editingTask.category}
-                                                                onChange={(e) => setEditingTask({...editingTask, category: e.target.value})}
-                                                                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                            >
-                                                                {Object.entries(categories).map(([key, cat]) => (
-                                                                    <option key={key} value={key}>{cat.label}</option>
-                                                                ))}
-                                                            </select>
-
-                                                            <select
-                                                                value={editingTask.urgency}
-                                                                onChange={(e) => setEditingTask({...editingTask, urgency: e.target.value})}
-                                                                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                            >
-                                                                <option value="low">Low</option>
-                                                                <option value="medium">Medium</option>
-                                                                <option value="high">High</option>
-                                                            </select>
-
-                                                            <select
-                                                                value={editingTask.impact}
-                                                                onChange={(e) => setEditingTask({...editingTask, impact: e.target.value})}
-                                                                className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                            >
-                                                                <option value="low">Low</option>
-                                                                <option value="medium">Medium</option>
-                                                                <option value="high">High</option>
-                                                            </select>
-                                                        </div>
-
-                                                        <div className="flex space-x-2">
-                                                            <input
-                                                                type="number"
-                                                                value={editingTask.timeEstimate}
-                                                                onChange={(e) => setEditingTask({...editingTask, timeEstimate: parseInt(e.target.value) || 0})}
-                                                                className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                                placeholder="Minutes"
-                                                            />
-                                                            <button
-                                                                onClick={saveEdit}
-                                                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                                            >
-                                                                Save
-                                                            </button>
-                                                            <button
-                                                                onClick={cancelEdit}
-                                                                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                                                            >
-                                                                Cancel
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex items-start justify-between">
-                                                        <div className="flex-1">
-                                                            <div className="flex items-center mb-2">
-                                                                <button
-                                                                    onClick={() => toggleTask(task.id)}
-                                                                    className={`mr-3 transition-colors ${
-                                                                        task.status === 'completed'
-                                                                            ? 'text-green-600'
-                                                                            : 'text-gray-400 hover:text-green-600'
-                                                                    }`}
-                                                                >
-                                                                    <CheckCircle className="h-5 w-5" />
-                                                                </button>
-                                                                <Icon className="h-4 w-4 mr-2 text-gray-600" />
-                                                                <span className={`text-sm font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-800'}`}>
-                                                                    {task.title}
-                                                                </span>
-                                                            </div>
-                                                            
-                                                            <div className="ml-8 flex items-center space-x-4 text-xs text-gray-500">
-                                                                <span>{category.label}</span>
-                                                                <span>•</span>
-                                                                <span>{task.timeEstimate}min</span>
-                                                                <span>•</span>
-                                                                <span className={`px-2 py-1 rounded ${
-                                                                    priorityScore >= 6 ? 'bg-red-100 text-red-800' :
-                                                                    priorityScore >= 4 ? 'bg-yellow-100 text-yellow-800' :
-                                                                    'bg-green-100 text-green-800'
-                                                                }`}>
-                                                                    {priorityScore >= 6 ? 'URGENT' : priorityScore >= 4 ? 'Important' : 'Normal'}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div className="flex space-x-1">
-                                                            <button
-                                                                onClick={() => startEdit(task)}
-                                                                className="text-gray-400 hover:text-blue-600 transition-colors"
-                                                            >
-                                                                <Edit2 className="h-4 w-4" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => deleteTask(task.id)}
-                                                                className="text-gray-400 hover:text-red-600 transition-colors"
-                                                            >
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </div>
+            <!-- Main App -->
+            <div class="main-app" id="mainApp">
+                <!-- Statistics -->
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalJobs">0</div>
+                        <div>Total Jobs</div>
                     </div>
-                    
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-lg font-semibold mb-4">Quick Action Guide</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div className="p-4 bg-red-50 rounded-lg">
-                                <h3 className="font-medium text-red-800 mb-2">🔥 Do First (High Urgency + High Impact)</h3>
-                                <p className="text-sm text-red-700">Customer estimates, urgent repairs, time-sensitive bids</p>
-                            </div>
-                            <div className="p-4 bg-blue-50 rounded-lg">
-                                <h3 className="font-medium text-blue-800 mb-2">📅 Schedule (Low Urgency + High Impact)</h3>
-                                <p className="text-sm text-blue-700">Build templates, pricing models, business development</p>
-                            </div>
-                            <div className="p-4 bg-green-50 rounded-lg">
-                                <h3 className="font-medium text-green-800 mb-2">⚡ Quick Wins (High Urgency + Low Impact)</h3>
-                                <p className="text-sm text-green-700">Quick calls, simple follow-ups, routine admin</p>
-                            </div>
-                        </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="highPriority">0</div>
+                        <div>High Priority</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="inProgress">0</div>
+                        <div>In Progress</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completed">0</div>
+                        <div>Completed</div>
                     </div>
                 </div>
-            );
-        };
 
-        ReactDOM.render(<RoofingTimeManager />, document.getElementById('root'));
+                <!-- Add Job Form -->
+                <div class="form-section">
+                    <h3>Add New Job</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Customer Name:</label>
+                            <input type="text" id="customerName" placeholder="John Smith">
+                        </div>
+                        <div class="form-group">
+                            <label>Address:</label>
+                            <input type="text" id="address" placeholder="123 Main St">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Job Type:</label>
+                            <select id="jobType">
+                                <option value="repair">Repair</option>
+                                <option value="replacement">Full Replacement</option>
+                                <option value="inspection">Inspection</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority:</label>
+                            <select id="priority">
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estimated Value ($):</label>
+                            <input type="number" id="value" placeholder="5000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes:</label>
+                        <textarea id="notes" rows="3" placeholder="Additional details..."></textarea>
+                    </div>
+                    <button onclick="addJob()">Add Job</button>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <select id="filterPriority" onchange="renderJobs()">
+                        <option value="">All Priorities</option>
+                        <option value="high">High Priority</option>
+                        <option value="medium">Medium Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                    <select id="filterStatus" onchange="renderJobs()">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                    <button onclick="exportJobs()">Export Data</button>
+                    <button onclick="logout()">Logout</button>
+                </div>
+
+                <!-- Jobs List -->
+                <div id="jobsList">
+                    <p style="text-align: center; color: #666; padding: 20px;">No jobs added yet. Add your first job above!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple JavaScript - no ES6 features
+        var jobs = [];
+        var isLoggedIn = false;
+
+        function login() {
+            var password = document.getElementById('passwordInput').value;
+            if (password === 'roofing123') {
+                isLoggedIn = true;
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                loadJobs();
+                updateStatus('Logged in successfully');
+            } else {
+                alert('Wrong password! Try: roofing123');
+            }
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+        }
+
+        function addJob() {
+            var customerName = document.getElementById('customerName').value;
+            var address = document.getElementById('address').value;
+            var jobType = document.getElementById('jobType').value;
+            var priority = document.getElementById('priority').value;
+            var value = document.getElementById('value').value;
+            var notes = document.getElementById('notes').value;
+
+            if (!customerName || !address) {
+                alert('Please enter customer name and address');
+                return;
+            }
+
+            var job = {
+                id: Date.now(),
+                customerName: customerName,
+                address: address,
+                jobType: jobType,
+                priority: priority,
+                value: parseInt(value) || 0,
+                notes: notes,
+                status: 'pending',
+                created: new Date().toLocaleDateString()
+            };
+
+            jobs.push(job);
+            
+            // Clear form
+            document.getElementById('customerName').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('value').value = '';
+            document.getElementById('notes').value = '';
+
+            saveJobs();
+            renderJobs();
+            updateStats();
+            updateStatus('Job added successfully');
+        }
+
+        function updateJobStatus(jobId, newStatus) {
+            for (var i = 0; i < jobs.length; i++) {
+                if (jobs[i].id == jobId) {
+                    jobs[i].status = newStatus;
+                    break;
+                }
+            }
+            saveJobs();
+            renderJobs();
+            updateStats();
+        }
+
+        function deleteJob(jobId) {
+            if (confirm('Delete this job?')) {
+                jobs = jobs.filter(function(job) {
+                    return job.id != jobId;
+                });
+                saveJobs();
+                renderJobs();
+                updateStats();
+                updateStatus('Job deleted');
+            }
+        }
+
+        function renderJobs() {
+            var priorityFilter = document.getElementById('filterPriority').value;
+            var statusFilter = document.getElementById('filterStatus').value;
+            
+            var filteredJobs = jobs.filter(function(job) {
+                var matchesPriority = !priorityFilter || job.priority === priorityFilter;
+                var matchesStatus = !statusFilter || job.status === statusFilter;
+                return matchesPriority && matchesStatus;
+            });
+
+            var html = '';
+            if (filteredJobs.length === 0) {
+                html = '<p style="text-align: center; color: #666; padding: 20px;">No jobs match the current filters</p>';
+            } else {
+                for (var i = 0; i < filteredJobs.length; i++) {
+                    var job = filteredJobs[i];
+                    html += '<div class="job-item ' + job.priority + '">';
+                    html += '<div class="job-header">' + job.customerName + '</div>';
+                    html += '<div class="job-details">';
+                    html += '<div class="job-detail"><strong>Address:</strong> ' + job.address + '</div>';
+                    html += '<div class="job-detail"><strong>Type:</strong> ' + job.jobType + '</div>';
+                    html += '<div class="job-detail"><strong>Priority:</strong> ' + job.priority + '</div>';
+                    html += '<div class="job-detail"><strong>Value:</strong> $' + job.value.toLocaleString() + '</div>';
+                    html += '<div class="job-detail"><strong>Status:</strong> ' + job.status + '</div>';
+                    html += '<div class="job-detail"><strong>Created:</strong> ' + job.created + '</div>';
+                    if (job.notes) {
+                        html += '<div class="job-detail"><strong>Notes:</strong> ' + job.notes + '</div>';
+                    }
+                    html += '</div>';
+                    html += '<div>';
+                    html += '<select onchange="updateJobStatus(' + job.id + ', this.value)">';
+                    html += '<option value="pending"' + (job.status === 'pending' ? ' selected' : '') + '>Pending</option>';
+                    html += '<option value="in-progress"' + (job.status === 'in-progress' ? ' selected' : '') + '>In Progress</option>';
+                    html += '<option value="completed"' + (job.status === 'completed' ? ' selected' : '') + '>Completed</option>';
+                    html += '</select>';
+                    html += '<button class="delete-btn" onclick="deleteJob(' + job.id + ')">Delete</button>';
+                    html += '</div>';
+                    html += '</div>';
+                }
+            }
+            
+            document.getElementById('jobsList').innerHTML = html;
+        }
+
+        function updateStats() {
+            var total = jobs.length;
+            var high = jobs.filter(function(job) { return job.priority === 'high'; }).length;
+            var inProg = jobs.filter(function(job) { return job.status === 'in-progress'; }).length;
+            var done = jobs.filter(function(job) { return job.status === 'completed'; }).length;
+
+            document.getElementById('totalJobs').textContent = total;
+            document.getElementById('highPriority').textContent = high;
+            document.getElementById('inProgress').textContent = inProg;
+            document.getElementById('completed').textContent = done;
+        }
+
+        function saveJobs() {
+            try {
+                localStorage.setItem('roofingJobs', JSON.stringify(jobs));
+            } catch (e) {
+                console.log('Could not save jobs');
+            }
+        }
+
+        function loadJobs() {
+            try {
+                var saved = localStorage.getItem('roofingJobs');
+                if (saved) {
+                    jobs = JSON.parse(saved);
+                }
+                renderJobs();
+                updateStats();
+            } catch (e) {
+                console.log('Could not load jobs');
+            }
+        }
+
+        function exportJobs() {
+            var dataStr = JSON.stringify(jobs, null, 2);
+            var dataBlob = new Blob([dataStr], {type: 'application/json'});
+            var url = URL.createObjectURL(dataBlob);
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = 'roofing-jobs.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+            setTimeout(function() {
+                document.getElementById('status').textContent = 'Ready';
+            }, 2000);
+        }
+
+        // Test that JavaScript is working
+        console.log('Roofing Manager loaded successfully');
     </script>
 </body>
 </html>
