@@ -626,29 +626,31 @@ const firebaseConfig = {
     // Save tasks to localStorage
     function saveTasks() {
         try {
-            var data = {
-                tasks: allTasks,
-                completed: completedTasks
-            };
-            localStorage.setItem('roofingTasks', JSON.stringify(data));
-        } catch (e) {
-            console.log('Could not save tasks');
-        }
-    }
+    const docRef = db.collection("shared").doc("roofing-tasks");
+    await docRef.set({
+      tasks: allTasks,
+      completed: completedTasks,
+      updatedAt: new Date().toISOString()
+    });
+  } catch (e) {
+    console.error("Error saving tasks to Firestore", e);
+  }
+}
 
     // Load tasks from localStorage
     function loadTasks() {
-        try {
-            var saved = localStorage.getItem('roofingTasks');
-            if (saved) {
-                var data = JSON.parse(saved);
-                allTasks = data.tasks || [];
-                completedTasks = data.completed || [];
-            }
-        } catch (e) {
-            console.log('Could not load tasks');
-        }
+       try {
+    const docRef = db.collection("shared").doc("roofing-tasks");
+    const doc = await docRef.get();
+    if (doc.exists) {
+      const data = doc.data();
+      allTasks = data.tasks || [];
+      completedTasks = data.completed || [];
     }
+  } catch (e) {
+    console.error("Error loading tasks from Firestore", e);
+  }
+}
 
     // Enter key for password
     document.addEventListener('DOMContentLoaded', function() {
