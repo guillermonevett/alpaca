@@ -7,96 +7,81 @@
     <title>Roofing Business Priority Manager</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
         .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .stat-card { padding: 15px; border-radius: 8px; text-align: center; }
-        .stat-card.blue { background: #dbeafe; color: #1e40af; }
-        .stat-card.red { background: #fecaca; color: #dc2626; }
-        .stat-card.green { background: #dcfce7; color: #16a34a; }
-        .stat-card.orange { background: #fed7aa; color: #ea580c; }
+        .stat-card.blue { background: #e3f2fd; color: #1976d2; }
+        .stat-card.red { background: #ffebee; color: #d32f2f; }
+        .stat-card.green { background: #e8f5e8; color: #388e3c; }
+        .stat-card.orange { background: #fff3e0; color: #f57c00; }
         .stat-number { font-size: 24px; font-weight: bold; margin-top: 5px; }
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-control { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
-        .form-control:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-control:focus { outline: none; border-color: #2196f3; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .btn { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-        .btn-primary { background: #3b82f6; color: white; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-success { background: #16a34a; color: white; }
-        .btn-success:hover { background: #15803d; }
-        .btn-warning { background: #ea580c; color: white; }
-        .btn-warning:hover { background: #c2410c; }
-        .btn-danger { background: #dc2626; color: white; }
-        .btn-danger:hover { background: #b91c1c; }
-        .btn-secondary { background: #6b7280; color: white; }
-        .btn-secondary:hover { background: #4b5563; }
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; margin: 2px; }
+        .btn-primary { background: #2196f3; color: white; }
+        .btn-primary:hover { background: #1976d2; }
+        .btn-success { background: #4caf50; color: white; }
+        .btn-success:hover { background: #388e3c; }
+        .btn-warning { background: #ff9800; color: white; }
+        .btn-warning:hover { background: #f57c00; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-danger:hover { background: #d32f2f; }
+        .btn-secondary { background: #757575; color: white; }
+        .btn-secondary:hover { background: #616161; }
         .task-list { max-height: 500px; overflow-y: auto; }
-        .task-item { border: 1px solid #e5e7eb; border-left: 4px solid; border-radius: 6px; padding: 15px; margin-bottom: 10px; transition: all 0.2s; }
-        .task-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .task-item.urgent { border-left-color: #dc2626; background: #fef2f2; }
-        .task-item.important { border-left-color: #ea580c; background: #fff7ed; }
-        .task-item.normal { border-left-color: #16a34a; background: #f0fdf4; }
-        .task-item.overdue { border-left-color: #991b1b; background: #fecaca; }
-        .task-item.completed { opacity: 0.6; background: #f9fafb; }
-        .task-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .task-title { font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-        .task-meta { font-size: 12px; color: #6b7280; display: flex; flex-wrap: wrap; gap: 15px; }
+        .task-item { border: 1px solid #e0e0e0; border-left: 4px solid #2196f3; border-radius: 4px; padding: 15px; margin-bottom: 10px; }
+        .task-item.urgent { border-left-color: #f44336; background: #ffebee; }
+        .task-item.important { border-left-color: #ff9800; background: #fff3e0; }
+        .task-item.normal { border-left-color: #4caf50; background: #e8f5e8; }
+        .task-item.overdue { border-left-color: #d32f2f; background: #ffcdd2; }
+        .task-title { font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .task-meta { font-size: 12px; color: #666; margin-bottom: 8px; }
+        .task-meta span { margin-right: 15px; }
         .task-actions { display: flex; gap: 5px; }
-        .task-actions button { background: none; border: none; cursor: pointer; padding: 5px; border-radius: 4px; }
-        .task-actions button:hover { background: #f3f4f6; }
-        .priority-badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
-        .priority-urgent { background: #fecaca; color: #991b1b; }
-        .priority-important { background: #fed7aa; color: #9a3412; }
-        .priority-normal { background: #dcfce7; color: #166534; }
+        .task-actions button { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 4px; }
+        .task-actions button:hover { background: #f5f5f5; }
+        .priority-badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .priority-urgent { background: #ffcdd2; color: #d32f2f; }
+        .priority-important { background: #fff3e0; color: #f57c00; }
+        .priority-normal { background: #e8f5e8; color: #388e3c; }
         .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal.show { display: flex; }
         .modal-content { background: white; border-radius: 8px; padding: 20px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .checkbox { width: auto; margin-right: 8px; }
         .hidden { display: none; }
+        .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .auth-card { background: white; border-radius: 8px; padding: 40px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; width: 100%; text-align: center; }
+        .main-app { display: none; }
         .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
         .guide-item { padding: 15px; border-radius: 8px; }
-        .guide-item.red { background: #fecaca; color: #991b1b; }
-        .guide-item.blue { background: #dbeafe; color: #1e3a8a; }
-        .guide-item.green { background: #dcfce7; color: #166534; }
-
-```
-    /* Authentication styles */
-    .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-    .auth-card { background: white; border-radius: 10px; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; width: 100%; text-align: center; }
-    .auth-card h1 { margin-bottom: 10px; color: #2c3e50; }
-    .auth-card p { color: #666; margin-bottom: 30px; }
-    .main-app { display: none; }
-
-    @media (max-width: 768px) { 
-        .main-grid { grid-template-columns: 1fr; } 
-        .form-grid { grid-template-columns: 1fr; }
-        .stats { grid-template-columns: repeat(2, 1fr); }
-    }
-</style>
-```
-
+        .guide-item.red { background: #ffebee; color: #d32f2f; }
+        .guide-item.blue { background: #e3f2fd; color: #1976d2; }
+        .guide-item.green { background: #e8f5e8; color: #388e3c; }
+        @media (max-width: 768px) { 
+            .main-grid { grid-template-columns: 1fr; } 
+            .form-grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .header { flex-direction: column; gap: 10px; }
+        }
+    </style>
 </head>
 <body>
     <!-- Authentication Screen -->
     <div class="auth-container" id="authContainer">
         <div class="auth-card">
             <h1>🏠 Roofing Priority Manager</h1>
-            <p>Access your business dashboard</p>
+            <p style="margin-bottom: 20px; color: #666;">Access your business dashboard</p>
             <div class="form-group">
-                <label>Password:</label>
                 <input type="password" id="passwordInput" class="form-control" placeholder="Enter password">
             </div>
-            <button onclick="authenticate()" class="btn btn-primary" style="width: 100%;">Login</button>
-            <p style="margin-top: 20px; color: #666; font-size: 14px;">
-                Default password: <strong>roofing123</strong>
-            </p>
+            <button onclick="doLogin()" class="btn btn-primary" style="width: 100%;">Login</button>
         </div>
     </div>
 
@@ -107,10 +92,10 @@
         <div class="card">
             <div class="header">
                 <h1>Roofing Business Priority Manager</h1>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-success" onclick="showReport()">📊 View Report</button>
-                    <button class="btn btn-primary" onclick="exportData()">💾 Export Data</button>
-                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-success" onclick="showReport()">📊 Report</button>
+                    <button class="btn btn-primary" onclick="exportData()">💾 Export</button>
+                    <button class="btn btn-secondary" onclick="doLogout()">Logout</button>
                 </div>
             </div>
 
@@ -136,7 +121,7 @@
             <div class="main-grid">
                 <div>
                     <h2 style="margin-bottom: 15px;">Add New Task</h2>
-                    <form id="taskForm">
+                    <form id="taskForm" onsubmit="return addTask()">
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="What needs to be done?" id="taskTitle" required>
                         </div>
@@ -203,7 +188,7 @@
                 <div>
                     <h2 style="margin-bottom: 15px;">Priority Queue</h2>
                     <div class="task-list" id="taskList">
-                        <!-- Tasks will be populated here -->
+                        <div style="text-align: center; padding: 40px; color: #666;">Add your first task to get started!</div>
                     </div>
                 </div>
             </div>
@@ -252,513 +237,406 @@
 </div>
 
 <script>
-    // Global variables
-    var tasks = [
-        {
-            id: 1,
-            title: 'Follow up on Johnson roof estimate',
-            category: 'estimates',
-            urgency: 'high',
-            impact: 'high',
-            timeEstimate: 30,
-            status: 'pending',
-            assignedTo: 'John Smith',
-            dueDate: '2025-07-26',
-            createdDate: '2025-07-25'
-        },
-        {
-            id: 2,
-            title: 'Create residential pricing template',
-            category: 'templates',
-            urgency: 'medium',
-            impact: 'high',
-            timeEstimate: 120,
-            status: 'pending',
-            assignedTo: 'Mike Johnson',
-            dueDate: '2025-07-28',
-            createdDate: '2025-07-25'
-        }
-    ];
+    // Simple global variables
+    var allTasks = [];
+    var completedTasks = [];
+    var currentTask = null;
 
-    var closedTasks = [];
-    var currentClosingTask = null;
-    var isAuthenticated = false;
-
-    var categories = {
-        'business-dev': { label: 'Business Development', icon: '👥' },
-        'sales': { label: 'Sales', icon: '💰' },
-        'pricing': { label: 'Pricing Models', icon: '💲' },
-        'templates': { label: 'Templates', icon: '📄' },
-        'estimates': { label: 'Estimates', icon: '✏️' },
-        'presentations': { label: 'Presentations', icon: '📊' }
+    // Categories
+    var taskCategories = {
+        'business-dev': { name: 'Business Development', icon: '👥' },
+        'sales': { name: 'Sales', icon: '💰' },
+        'pricing': { name: 'Pricing Models', icon: '💲' },
+        'templates': { name: 'Templates', icon: '📄' },
+        'estimates': { name: 'Estimates', icon: '✏️' },
+        'presentations': { name: 'Presentations', icon: '📊' }
     };
 
-    var teamMembers = ['John Smith', 'Mike Johnson', 'Sarah Davis', 'Tom Wilson', 'Lisa Brown', 'Unassigned'];
-
-    // Authentication
-    function authenticate() {
-        var password = document.getElementById('passwordInput').value;
-        if (password === 'roofing123') {
-            isAuthenticated = true;
+    // Simple login function
+    function doLogin() {
+        var pwd = document.getElementById('passwordInput').value;
+        if (pwd === 'roofing123') {
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
-            loadData();
-            initialize();
+            initApp();
         } else {
-            alert('Incorrect password! Try: roofing123');
+            alert('Wrong password');
         }
     }
 
-    function logout() {
-        isAuthenticated = false;
+    // Simple logout function
+    function doLogout() {
         document.getElementById('authContainer').style.display = 'flex';
         document.getElementById('mainApp').style.display = 'none';
         document.getElementById('passwordInput').value = '';
     }
 
-    // Initialize
-    function initialize() {
-        document.getElementById('taskDueDate').value = new Date().toISOString().split('T')[0];
-        renderTasks();
-        updateStats();
+    // Initialize app
+    function initApp() {
+        setTodayDate();
+        loadTasks();
+        showTasks();
+        updateNumbers();
     }
 
-    // Task management functions
-    function getPriorityScore(task) {
+    // Set today's date
+    function setTodayDate() {
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = today.getMonth() + 1;
+        var day = today.getDate();
+        
+        if (month < 10) month = '0' + month;
+        if (day < 10) day = '0' + day;
+        
+        document.getElementById('taskDueDate').value = year + '-' + month + '-' + day;
+    }
+
+    // Add task function
+    function addTask() {
+        var title = document.getElementById('taskTitle').value;
+        var category = document.getElementById('taskCategory').value;
+        var time = document.getElementById('taskTime').value;
+        var assignee = document.getElementById('taskAssignee').value;
+        var dueDate = document.getElementById('taskDueDate').value;
+        var urgency = document.getElementById('taskUrgency').value;
+        var impact = document.getElementById('taskImpact').value;
+
+        if (!title) {
+            alert('Please enter a task title');
+            return false;
+        }
+
+        var newTask = {
+            id: new Date().getTime(),
+            title: title,
+            category: category,
+            time: parseInt(time) || 60,
+            assignee: assignee,
+            dueDate: dueDate,
+            urgency: urgency,
+            impact: impact,
+            status: 'active',
+            created: new Date().toISOString().split('T')[0]
+        };
+
+        allTasks.push(newTask);
+        
+        // Clear form
+        document.getElementById('taskForm').reset();
+        document.getElementById('taskCategory').value = 'estimates';
+        document.getElementById('taskTime').value = '60';
+        document.getElementById('taskUrgency').value = 'medium';
+        document.getElementById('taskImpact').value = 'medium';
+        setTodayDate();
+        
+        saveTasks();
+        showTasks();
+        updateNumbers();
+        return false;
+    }
+
+    // Calculate priority score
+    function getPriority(task) {
         var urgencyScore = task.urgency === 'high' ? 3 : task.urgency === 'medium' ? 2 : 1;
         var impactScore = task.impact === 'high' ? 3 : task.impact === 'medium' ? 2 : 1;
         return urgencyScore * impactScore;
     }
 
-    function isOverdue(task) {
-        if (task.status === 'completed') return false;
-        return new Date(task.dueDate) < new Date();
+    // Check if overdue
+    function isTaskOverdue(task) {
+        var today = new Date();
+        var due = new Date(task.dueDate);
+        return due < today && task.status === 'active';
     }
 
-    function addTask() {
-        var newTask = {
-            id: Date.now(),
-            title: document.getElementById('taskTitle').value,
-            category: document.getElementById('taskCategory').value,
-            timeEstimate: parseInt(document.getElementById('taskTime').value) || 60,
-            assignedTo: document.getElementById('taskAssignee').value,
-            dueDate: document.getElementById('taskDueDate').value,
-            urgency: document.getElementById('taskUrgency').value,
-            impact: document.getElementById('taskImpact').value,
-            status: 'pending',
-            createdDate: new Date().toISOString().split('T')[0]
-        };
-
-        tasks.push(newTask);
+    // Show tasks
+    function showTasks() {
+        var list = document.getElementById('taskList');
         
-        // Clear form
-        document.getElementById('taskForm').reset();
-        document.getElementById('taskDueDate').value = new Date().toISOString().split('T')[0];
-        
-        saveData();
-        renderTasks();
-        updateStats();
-    }
-
-    function deleteTask(id) {
-        if (confirm('Are you sure you want to delete this task?')) {
-            tasks = tasks.filter(function(task) { return task.id !== id; });
-            saveData();
-            renderTasks();
-            updateStats();
+        if (allTasks.length === 0) {
+            list.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">Add your first task to get started!</div>';
+            return;
         }
+
+        // Sort tasks
+        var sorted = allTasks.slice().sort(function(a, b) {
+            if (isTaskOverdue(a) && !isTaskOverdue(b)) return -1;
+            if (!isTaskOverdue(a) && isTaskOverdue(b)) return 1;
+            return getPriority(b) - getPriority(a);
+        });
+
+        var html = '';
+        for (var i = 0; i < sorted.length; i++) {
+            var task = sorted[i];
+            if (task.status !== 'active') continue;
+            
+            var cat = taskCategories[task.category];
+            var priority = getPriority(task);
+            var overdue = isTaskOverdue(task);
+            
+            var cssClass = 'task-item ';
+            if (overdue) cssClass += 'overdue';
+            else if (priority >= 6) cssClass += 'urgent';
+            else if (priority >= 4) cssClass += 'important';
+            else cssClass += 'normal';
+
+            var priorityText = priority >= 6 ? 'URGENT' : priority >= 4 ? 'Important' : 'Normal';
+            var priorityClass = priority >= 6 ? 'priority-urgent' : priority >= 4 ? 'priority-important' : 'priority-normal';
+
+            html += '<div class="' + cssClass + '">';
+            html += '<div class="task-title">';
+            html += '<button onclick="openTaskModal(' + task.id + ')" style="background:none;border:none;cursor:pointer;color:#666;">⭕</button>';
+            html += '<span>' + cat.icon + '</span>';
+            html += '<span>' + task.title + '</span>';
+            if (overdue) html += '<span style="color:#f44336;">⚠️</span>';
+            html += '</div>';
+            
+            html += '<div class="task-meta">';
+            html += '<span>' + cat.name + '</span>';
+            html += '<span>' + task.time + 'min</span>';
+            html += '<span class="priority-badge ' + priorityClass + '">' + priorityText + '</span>';
+            html += '<span>👤 ' + task.assignee + '</span>';
+            html += '<span style="' + (overdue ? 'color:#f44336;font-weight:bold;' : '') + '">📅 ' + task.dueDate + '</span>';
+            html += '</div>';
+            
+            html += '<div class="task-actions">';
+            html += '<button onclick="editTaskTitle(' + task.id + ')" title="Edit">✏️</button>';
+            html += '<button onclick="deleteTask(' + task.id + ')" title="Delete" style="color:#f44336;">🗑️</button>';
+            html += '</div>';
+            html += '</div>';
+        }
+        
+        list.innerHTML = html;
     }
 
-    function startTaskClosure(id) {
-        currentClosingTask = null;
-        for (var i = 0; i < tasks.length; i++) {
-            if (tasks[i].id === id) {
-                currentClosingTask = tasks[i];
+    // Update stats
+    function updateNumbers() {
+        var activeTasks = [];
+        for (var i = 0; i < allTasks.length; i++) {
+            if (allTasks[i].status === 'active') {
+                activeTasks.push(allTasks[i]);
+            }
+        }
+        
+        var totalTime = 0;
+        var highPriority = 0;
+        var overdue = 0;
+        
+        for (var i = 0; i < activeTasks.length; i++) {
+            totalTime += activeTasks[i].time;
+            if (getPriority(activeTasks[i]) >= 6) highPriority++;
+            if (isTaskOverdue(activeTasks[i])) overdue++;
+        }
+
+        var hours = Math.floor(totalTime / 60);
+        var mins = totalTime % 60;
+        
+        document.getElementById('totalTime').textContent = hours + 'h ' + mins + 'm';
+        document.getElementById('highPriority').textContent = highPriority;
+        document.getElementById('completedTasks').textContent = completedTasks.length;
+        document.getElementById('overdueTasks').textContent = overdue;
+    }
+
+    // Open task completion modal
+    function openTaskModal(taskId) {
+        currentTask = null;
+        for (var i = 0; i < allTasks.length; i++) {
+            if (allTasks[i].id === taskId) {
+                currentTask = allTasks[i];
                 break;
             }
         }
-        if (currentClosingTask) {
-            showClosureModal();
+        
+        if (currentTask) {
+            var content = document.getElementById('closureContent');
+            content.innerHTML = '<h4>Close Task: ' + currentTask.title + '</h4>' +
+                '<p style="margin:15px 0;color:#666;">Mark this task as completed?</p>' +
+                '<button onclick="markCompleted()" class="btn btn-success" style="width:100%;margin-bottom:15px;">✅ Mark as Completed</button>' +
+                '<div style="border:1px solid #ffa726;background:#fff3e0;padding:15px;border-radius:4px;">' +
+                '<p style="font-weight:bold;margin-bottom:10px;">⚠️ Close without completing</p>' +
+                '<textarea id="closeReason" placeholder="Why wasn\'t this completed?" class="form-control" rows="3"></textarea>' +
+                '<button onclick="closeIncomplete()" class="btn btn-warning" style="width:100%;margin-top:10px;">Close with Reason</button>' +
+                '</div>';
+            
+            document.getElementById('closureModal').classList.add('show');
         }
     }
 
-    function completeTask(id) {
+    // Mark task as completed
+    function markCompleted() {
+        if (currentTask) {
+            currentTask.status = 'completed';
+            currentTask.completedDate = new Date().toISOString().split('T')[0];
+            currentTask.reason = 'completed';
+            completedTasks.push(currentTask);
+            
+            saveTasks();
+            showTasks();
+            updateNumbers();
+            closeModal('closureModal');
+        }
+    }
+
+    // Close task incomplete
+    function closeIncomplete() {
+        var reason = document.getElementById('closeReason').value;
+        if (!reason.trim()) {
+            alert('Please provide a reason');
+            return;
+        }
+        
+        if (currentTask) {
+            currentTask.status = 'closed';
+            currentTask.completedDate = new Date().toISOString().split('T')[0];
+            currentTask.reason = reason;
+            completedTasks.push(currentTask);
+            
+            saveTasks();
+            showTasks();
+            updateNumbers();
+            closeModal('closureModal');
+        }
+    }
+
+    // Edit task title
+    function editTaskTitle(taskId) {
         var task = null;
-        for (var i = 0; i < tasks.length; i++) {
-            if (tasks[i].id === id) {
-                task = tasks[i];
+        for (var i = 0; i < allTasks.length; i++) {
+            if (allTasks[i].id === taskId) {
+                task = allTasks[i];
                 break;
             }
         }
         
         if (task) {
-            task.status = 'closed';
-            task.completedDate = new Date().toISOString().split('T')[0];
-            task.closureReason = 'completed';
-            
-            closedTasks.push(task);
-            tasks = tasks.filter(function(t) { return t.id !== id; });
-            
-            saveData();
-            renderTasks();
-            updateStats();
-            closeModal('closureModal');
+            var newTitle = prompt('Edit task title:', task.title);
+            if (newTitle && newTitle.trim()) {
+                task.title = newTitle.trim();
+                saveTasks();
+                showTasks();
+            }
         }
     }
 
-    function closeTaskWithReason() {
-        var reason = document.getElementById('closureReason').value;
-        var needsSuccessor = document.getElementById('needsSuccessor').checked;
-        
-        if (!reason.trim()) {
-            alert('Please provide a reason why the task wasn\'t completed.');
-            return;
-        }
-
-        currentClosingTask.status = 'closed';
-        currentClosingTask.completedDate = new Date().toISOString().split('T')[0];
-        currentClosingTask.closureReason = reason;
-        
-        closedTasks.push(currentClosingTask);
-        tasks = tasks.filter(function(t) { return t.id !== currentClosingTask.id; });
-
-        if (needsSuccessor) {
-            var successorTask = {
-                id: Date.now(),
-                title: document.getElementById('successorTitle').value || 'Follow-up: ' + currentClosingTask.title,
-                category: document.getElementById('successorCategory').value,
-                timeEstimate: parseInt(document.getElementById('successorTime').value) || 60,
-                assignedTo: document.getElementById('successorAssignee').value,
-                dueDate: document.getElementById('successorDueDate').value,
-                urgency: document.getElementById('successorUrgency').value,
-                impact: document.getElementById('successorImpact').value,
-                status: 'pending',
-                createdDate: new Date().toISOString().split('T')[0]
-            };
-            tasks.push(successorTask);
-        }
-
-        saveData();
-        closeModal('closureModal');
-        renderTasks();
-        updateStats();
-    }
-
-    function renderTasks() {
-        var taskList = document.getElementById('taskList');
-        
-        // Sort tasks: overdue first, then by priority score
-        var sortedTasks = tasks.slice().sort(function(a, b) {
-            if (isOverdue(a) && !isOverdue(b)) return -1;
-            if (!isOverdue(a) && isOverdue(b)) return 1;
-            if (a.status === 'completed' && b.status === 'pending') return 1;
-            if (a.status === 'pending' && b.status === 'completed') return -1;
-            return getPriorityScore(b) - getPriorityScore(a);
-        });
-
-        var html = '';
-        for (var i = 0; i < sortedTasks.length; i++) {
-            var task = sortedTasks[i];
-            var category = categories[task.category];
-            var priorityScore = getPriorityScore(task);
-            var overdue = isOverdue(task);
-            
-            var taskClass = 'task-item ';
-            if (overdue) taskClass += 'overdue';
-            else if (task.status === 'completed') taskClass += 'completed';
-            else if (priorityScore >= 6) taskClass += 'urgent';
-            else if (priorityScore >= 4) taskClass += 'important';
-            else taskClass += 'normal';
-
-            var priorityLabel = priorityScore >= 6 ? 'URGENT' : priorityScore >= 4 ? 'Important' : 'Normal';
-            var priorityBadgeClass = priorityScore >= 6 ? 'priority-urgent' : priorityScore >= 4 ? 'priority-important' : 'priority-normal';
-
-            html += '<div class="' + taskClass + '">';
-            html += '<div class="task-header">';
-            html += '<div style="flex: 1;">';
-            html += '<div class="task-title">';
-            html += '<button onclick="startTaskClosure(' + task.id + ')" style="background: none; border: none; cursor: pointer; color: ' + (task.status === 'completed' ? '#16a34a' : '#6b7280') + ';">';
-            html += task.status === 'completed' ? '✅' : '⭕';
-            html += '</button>';
-            html += '<span>' + category.icon + '</span>';
-            html += '<span style="' + (task.status === 'completed' ? 'text-decoration: line-through; color: #6b7280;' : '') + '">' + task.title + '</span>';
-            if (overdue) html += '<span style="color: #dc2626;">⚠️</span>';
-            html += '</div>';
-            html += '<div class="task-meta">';
-            html += '<span>' + category.label + '</span>';
-            html += '<span>' + task.timeEstimate + 'min</span>';
-            html += '<span class="priority-badge ' + priorityBadgeClass + '">' + priorityLabel + '</span>';
-            html += '<span>👤 ' + task.assignedTo + '</span>';
-            html += '<span style="' + (overdue ? 'color: #dc2626; font-weight: 600;' : '') + '">📅 ' + task.dueDate + '</span>';
-            html += '</div>';
-            html += '</div>';
-            html += '<div class="task-actions">';
-            html += '<button onclick="editTask(' + task.id + ')" title="Edit">✏️</button>';
-            html += '<button onclick="deleteTask(' + task.id + ')" title="Delete" style="color: #dc2626;">🗑️</button>';
-            html += '</div>';
-            html += '</div>';
-            html += '</div>';
-        }
-        
-        if (html === '') {
-            html = '<div style="text-align: center; padding: 40px; color: #666;">No tasks found. Add your first task!</div>';
-        }
-        
-        taskList.innerHTML = html;
-    }
-
-    function updateStats() {
-        var pendingTasks = tasks.filter(function(t) { return t.status === 'pending'; });
-        var totalTime = 0;
-        for (var i = 0; i < pendingTasks.length; i++) {
-            totalTime += pendingTasks[i].timeEstimate;
-        }
-        var highPriority = pendingTasks.filter(function(t) { return getPriorityScore(t) >= 6; }).length;
-        var completed = closedTasks.filter(function(t) { return t.closureReason === 'completed'; }).length;
-        var overdue = tasks.filter(isOverdue).length;
-
-        document.getElementById('totalTime').textContent = Math.floor(totalTime / 60) + 'h ' + (totalTime % 60) + 'm';
-        document.getElementById('highPriority').textContent = highPriority;
-        document.getElementById('completedTasks').textContent = completed;
-        document.getElementById('overdueTasks').textContent = overdue;
-    }
-
-    function showClosureModal() {
-        var modal = document.getElementById('closureModal');
-        var content = document.getElementById('closureContent');
-        
-        var teamMembersOptions = '';
-        for (var i = 0; i < teamMembers.length; i++) {
-            teamMembersOptions += '<option value="' + teamMembers[i] + '">' + teamMembers[i] + '</option>';
-        }
-        
-        content.innerHTML = '<h4>Close Task: ' + currentClosingTask.title + '</h4>' +
-            '<p style="margin: 15px 0; color: #6b7280;">How was this task completed?</p>' +
-            '<button onclick="completeTask(' + currentClosingTask.id + ')" class="btn btn-success" style="width: 100%; margin-bottom: 15px;">' +
-            '✅ Task completed successfully</button>' +
-            '<div style="border: 1px solid #fbbf24; background: #fef3c7; padding: 15px; border-radius: 6px;">' +
-            '<p style="font-weight: 600; margin-bottom: 10px;">⚠️ Task not completed - needs follow-up</p>' +
-            '<textarea id="closureReason" placeholder="Why wasn\'t this completed? (required)" class="form-control" rows="3" style="margin-bottom: 10px;"></textarea>' +
-            '<label style="display: flex; align-items: center; margin-bottom: 15px;">' +
-            '<input type="checkbox" id="needsSuccessor" class="checkbox" onchange="toggleSuccessorForm()">' +
-            '<span>Create a follow-up task</span></label>' +
-            '<div id="successorForm" class="hidden" style="border-left: 3px solid #3b82f6; padding-left: 15px; margin-left: 15px;">' +
-            '<div class="form-group"><input type="text" id="successorTitle" placeholder="Follow-up task title" class="form-control"></div>' +
-            '<div class="form-grid">' +
-            '<select id="successorCategory" class="form-control">' +
-            '<option value="business-dev">Business Development</option>' +
-            '<option value="sales">Sales</option>' +
-            '<option value="pricing">Pricing Models</option>' +
-            '<option value="templates">Templates</option>' +
-            '<option value="estimates">Estimates</option>' +
-            '<option value="presentations">Presentations</option></select>' +
-            '<select id="successorAssignee" class="form-control">' + teamMembersOptions + '</select></div>' +
-            '<div class="form-grid-3">' +
-            '<select id="successorUrgency" class="form-control">' +
-            '<option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>' +
-            '<select id="successorImpact" class="form-control">' +
-            '<option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>' +
-            '<input type="number" id="successorTime" placeholder="Minutes" class="form-control" value="60"></div>' +
-            '<input type="date" id="successorDueDate" class="form-control" value="' + new Date().toISOString().split('T')[0] + '"></div>' +
-            '<button onclick="closeTaskWithReason()" class="btn btn-warning" style="width: 100%; margin-top: 15px;">Close with Reason</button></div>';
-        
-        modal.classList.add('show');
-    }
-
-    function toggleSuccessorForm() {
-        var form = document.getElementById('successorForm');
-        var checkbox = document.getElementById('needsSuccessor');
-        
-        if (checkbox.checked) {
-            form.classList.remove('hidden');
-        } else {
-            form.classList.add('hidden');
+    // Delete task
+    function deleteTask(taskId) {
+        if (confirm('Delete this task?')) {
+            var newTasks = [];
+            for (var i = 0; i < allTasks.length; i++) {
+                if (allTasks[i].id !== taskId) {
+                    newTasks.push(allTasks[i]);
+                }
+            }
+            allTasks = newTasks;
+            saveTasks();
+            showTasks();
+            updateNumbers();
         }
     }
 
+    // Show report
     function showReport() {
-        var modal = document.getElementById('reportModal');
-        var content = document.getElementById('reportContent');
+        var active = 0;
+        var completed = 0;
+        var incomplete = 0;
+        var overdue = 0;
         
-        var allTasks = tasks.concat(closedTasks);
-        var completed = closedTasks.filter(function(t) { return t.closureReason === 'completed'; }).length;
-        var incomplete = closedTasks.filter(function(t) { return t.closureReason !== 'completed'; }).length;
-        var overdue = tasks.filter(isOverdue).length;
-
-        var memberStatsHtml = '';
-        for (var i = 0; i < teamMembers.length; i++) {
-            var member = teamMembers[i];
-            var memberTasks = allTasks.filter(function(t) { return t.assignedTo === member; });
-            var memberCompleted = closedTasks.filter(function(t) { return t.assignedTo === member && t.closureReason === 'completed'; }).length;
-            memberStatsHtml += '<div style="display: flex; justify-content: space-between; padding: 8px; background: #f9fafb; margin-bottom: 5px; border-radius: 4px;">' +
-                '<span style="font-weight: 500;">' + member + '</span>' +
-                '<span style="color: #6b7280;">' + memberTasks.length + ' total, ' + memberCompleted + ' completed</span></div>';
+        for (var i = 0; i < allTasks.length; i++) {
+            if (allTasks[i].status === 'active') {
+                active++;
+                if (isTaskOverdue(allTasks[i])) overdue++;
+            }
         }
-
-        var recentClosuresHtml = '';
-        var recentClosures = closedTasks.slice(-10).reverse();
-        if (recentClosures.length === 0) {
-            recentClosuresHtml = '<p style="color: #6b7280;">No tasks closed yet</p>';
-        } else {
-            for (var i = 0; i < recentClosures.length; i++) {
-                var task = recentClosures[i];
-                var statusColor = task.closureReason === 'completed' ? '#16a34a' : '#ea580c';
-                var statusText = task.closureReason === 'completed' ? '✅ Completed' : '⚠️ ' + task.closureReason;
-                recentClosuresHtml += '<div style="padding: 8px; background: #f9fafb; margin-bottom: 5px; border-radius: 4px; font-size: 14px;">' +
-                    '<div style="font-weight: 500;">' + task.title + '</div>' +
-                    '<div style="color: #6b7280;">' + task.assignedTo + ' - ' + task.completedDate + ' - ' +
-                    '<span style="color: ' + statusColor + ';">' + statusText + '</span></div></div>';
+        
+        for (var i = 0; i < completedTasks.length; i++) {
+            if (completedTasks[i].reason === 'completed') {
+                completed++;
+            } else {
+                incomplete++;
             }
         }
 
-        content.innerHTML = '<div class="stats" style="margin-bottom: 20px;">' +
-            '<div class="stat-card blue"><div>Active Tasks</div><div class="stat-number">' + tasks.length + '</div></div>' +
+        var content = document.getElementById('reportContent');
+        content.innerHTML = '<div class="stats">' +
+            '<div class="stat-card blue"><div>Active Tasks</div><div class="stat-number">' + active + '</div></div>' +
             '<div class="stat-card green"><div>Completed</div><div class="stat-number">' + completed + '</div></div>' +
             '<div class="stat-card orange"><div>Incomplete</div><div class="stat-number">' + incomplete + '</div></div>' +
-            '<div class="stat-card red"><div>Overdue</div><div class="stat-number">' + overdue + '</div></div></div>' +
-            '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">' +
-            '<div><h4 style="margin-bottom: 10px;">Tasks by Team Member</h4>' +
-            '<div style="max-height: 200px; overflow-y: auto;">' + memberStatsHtml + '</div></div>' +
-            '<div><h4 style="margin-bottom: 10px;">Recent Closures</h4>' +
-            '<div style="max-height: 200px; overflow-y: auto;">' + recentClosuresHtml + '</div></div></div>';
+            '<div class="stat-card red"><div>Overdue</div><div class="stat-number">' + overdue + '</div></div>' +
+            '</div>';
         
-        modal.classList.add('show');
+        document.getElementById('reportModal').classList.add('show');
     }
 
+    // Export data
     function exportData() {
-        var allTasks = tasks.concat(closedTasks);
-        
-        var tasksByAssignee = {};
-        for (var i = 0; i < teamMembers.length; i++) {
-            var member = teamMembers[i];
-            tasksByAssignee[member] = {
-                total: allTasks.filter(function(t) { return t.assignedTo === member; }).length,
-                completed: closedTasks.filter(function(t) { return t.assignedTo === member && t.closureReason === 'completed'; }).length,
-                active: tasks.filter(function(t) { return t.assignedTo === member; }).length
-            };
-        }
-
-        var tasksByCategory = {};
-        var categoryKeys = Object.keys(categories);
-        for (var i = 0; i < categoryKeys.length; i++) {
-            var cat = categoryKeys[i];
-            tasksByCategory[cat] = {
-                total: allTasks.filter(function(t) { return t.category === cat; }).length,
-                completed: closedTasks.filter(function(t) { return t.category === cat && t.closureReason === 'completed'; }).length,
-                active: tasks.filter(function(t) { return t.category === cat; }).length
-            };
-        }
-
-        var report = {
-            generatedDate: new Date().toISOString().split('T')[0],
-            generatedTime: new Date().toLocaleTimeString(),
-            summary: {
-                totalTasks: allTasks.length,
-                activeTasks: tasks.length,
-                completedTasks: closedTasks.filter(function(t) { return t.closureReason === 'completed'; }).length,
-                incompleteTasks: closedTasks.filter(function(t) { return t.closureReason !== 'completed'; }).length,
-                overdueTasks: tasks.filter(isOverdue).length
-            },
-            tasksByAssignee: tasksByAssignee,
-            tasksByCategory: tasksByCategory,
-            activeTasks: tasks,
-            closedTasks: closedTasks
+        var data = {
+            date: new Date().toISOString().split('T')[0],
+            activeTasks: allTasks,
+            completedTasks: completedTasks
         };
-
-        var dataStr = JSON.stringify(report, null, 2);
-        var dataBlob = new Blob([dataStr], {type: 'application/json'});
-        var url = URL.createObjectURL(dataBlob);
+        
+        var text = JSON.stringify(data, null, 2);
+        var blob = new Blob([text], {type: 'application/json'});
+        var url = URL.createObjectURL(blob);
         var link = document.createElement('a');
         link.href = url;
-        link.download = 'roofing-report-' + report.generatedDate + '.json';
+        link.download = 'roofing-tasks-' + data.date + '.json';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }
 
-    function editTask(id) {
-        var task = null;
-        for (var i = 0; i < tasks.length; i++) {
-            if (tasks[i].id === id) {
-                task = tasks[i];
-                break;
-            }
-        }
-        if (!task) return;
-
-        var newTitle = prompt('Edit task title:', task.title);
-        if (newTitle && newTitle.trim()) {
-            task.title = newTitle.trim();
-            saveData();
-            renderTasks();
-        }
-    }
-
+    // Close modal
     function closeModal(modalId) {
         document.getElementById(modalId).classList.remove('show');
     }
 
-    // Data persistence
-    function saveData() {
+    // Save tasks to localStorage
+    function saveTasks() {
         try {
             var data = {
-                tasks: tasks,
-                closedTasks: closedTasks,
-                lastUpdated: new Date().toISOString()
+                tasks: allTasks,
+                completed: completedTasks
             };
-            localStorage.setItem('roofingPriorityData', JSON.stringify(data));
+            localStorage.setItem('roofingTasks', JSON.stringify(data));
         } catch (e) {
-            console.log('Could not save data to localStorage');
+            console.log('Could not save tasks');
         }
     }
 
-    function loadData() {
+    // Load tasks from localStorage
+    function loadTasks() {
         try {
-            var saved = localStorage.getItem('roofingPriorityData');
+            var saved = localStorage.getItem('roofingTasks');
             if (saved) {
                 var data = JSON.parse(saved);
-                if (data.tasks) tasks = data.tasks;
-                if (data.closedTasks) closedTasks = data.closedTasks;
+                allTasks = data.tasks || [];
+                completedTasks = data.completed || [];
             }
         } catch (e) {
-            console.log('Could not load data from localStorage');
+            console.log('Could not load tasks');
         }
     }
 
-    // Event listeners
+    // Enter key for password
     document.addEventListener('DOMContentLoaded', function() {
-        // Form submission
-        document.getElementById('taskForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            addTask();
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                doLogin();
+            }
         });
-
-        // Close modals when clicking outside
+        
+        // Close modals on click outside
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('modal')) {
                 e.target.classList.remove('show');
             }
         });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                var modals = document.querySelectorAll('.modal.show');
-                for (var i = 0; i < modals.length; i++) {
-                    modals[i].classList.remove('show');
-                }
-            }
-        });
-
-        // Enter key for password
-        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                authenticate();
-            }
-        });
     });
-
-    // Initialize with authentication check
-    console.log('Roofing Priority Manager loaded successfully');
+</script>
 ```
+
+</body>
+</html>
