@@ -4,17 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Roofing Business Priority Manager</title>
-  <!-- Firebase v10 CDN (Compatible with plain <script>) -->
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
-    .auth-container, .main-app { display: flex; align-items: center; justify-content: center; height: 100vh; }
-    .auth-card { background: white; border-radius: 8px; padding: 40px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; width: 100%; text-align: center; }
-    .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; }
-    .btn-primary { background: #2196f3; color: white; }
-    .btn-primary:hover { background: #1976d2; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    .auth-container, .main-app { max-width: 500px; margin: 0 auto; text-align: center; }
+    .auth-card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .btn { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    .btn-primary { background: #007bff; color: white; border: none; border-radius: 4px; }
+    input[type="text"] { width: 70%; padding: 10px; margin-right: 10px; }
   </style>
 </head>
 <body>
@@ -31,8 +30,11 @@
   <!-- Main Application -->
   <div class="main-app" id="mainApp" style="display:none">
     <h2>Welcome to the Roofing Priority Manager</h2>
-    <!-- You can place your full UI code here -->
-    <div id="taskList">Loading tasks...</div>
+    <div style="margin: 20px 0;">
+      <input type="text" id="taskInput" placeholder="Enter new task title" />
+      <button class="btn btn-primary" onclick="addTask()">Add Task</button>
+    </div>
+    <ul id="taskList"></ul>
   </div>
 
   <script>
@@ -52,10 +54,6 @@
     let allTasks = [];
     let completedTasks = [];
 
-    function initApp() {
-      loadTasks();
-    }
-
     document.getElementById("googleLogin").addEventListener("click", () => {
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider).then(result => {
@@ -65,8 +63,8 @@
           document.getElementById("authError").style.display = "block";
         } else {
           document.getElementById("authContainer").style.display = "none";
-          document.getElementById("mainApp").style.display = "flex";
-          initApp();
+          document.getElementById("mainApp").style.display = "block";
+          loadTasks();
         }
       }).catch(err => {
         console.error("Login error:", err);
@@ -87,14 +85,42 @@
           const data = doc.data();
           allTasks = data.tasks || [];
           completedTasks = data.completed || [];
-          document.getElementById("taskList").textContent = JSON.stringify(allTasks, null, 2);
-        } else {
-          document.getElementById("taskList").textContent = "No tasks found.";
+          showTasks();
         }
-      }).catch(error => {
-        console.error("Error loading tasks:", error);
-        document.getElementById("taskList").textContent = "Error loading tasks.";
-      });
+      }).catch(console.error);
+    }
+
+    function showTasks() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+      if (allTasks.length === 0) {
+        list.innerHTML = "<li>No tasks found.</li>";
+      } else {
+        allTasks.forEach(task => {
+          const li = document.createElement("li");
+          li.textContent = task.title;
+          list.appendChild(li);
+        });
+      }
+    }
+
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const title = input.value.trim();
+      if (!title) return;
+      const newTask = {
+        id: Date.now(),
+        title,
+        category: "general",
+        urgency: "medium",
+        impact: "medium",
+        timeEstimate: 30,
+        status: "pending"
+      };
+      allTasks.push(newTask);
+      input.value = "";
+      saveTasks();
+      showTasks();
     }
   </script>
 </body>
